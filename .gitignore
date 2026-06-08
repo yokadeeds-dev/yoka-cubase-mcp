@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Claude Code working dir
+.claude/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Runtime artifacts
+runtime/state.json
+runtime/state.json.tmp
+runtime/state/snapshots/*.json
+runtime/state/*.log
+*.log
+
+# Local secrets / overrides
+.env
+.env.local
+local_*
+
+# Build outputs
+dist/
+build/
+*.whl
+
+# Output binaries (Magenta-RT-Audio etc. — README + Begleit-Metadaten landen im Git, Audio-Files nicht)
+outputs/**/*.wav
+outputs/**/*.mp3
+outputs/**/*.flac
+outputs/**/*.m4a
+outputs/**/*.aiff
+outputs/**/*.ogg
+
+# Private Planungs-Chats (lokal behalten, nicht public)
+docs/_history/

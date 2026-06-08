@@ -1,0 +1,81 @@
+{
+  "_comment": "Zentrale Mackie Control Universal Protokoll-Map. Quellenreferenz: KI_STUDIO_MACKIE_BRIEFING.md §9 + Mackie MCU MIDI-Spezifikation. Alle Hex-Werte in dezimal als ints zur einfachen Verwendung in Python.",
+  "version": "0.1.0",
+  "sysex": {
+    "manufacturer_id": [0, 0, 102],
+    "_comment_manufacturer": "0x00 0x00 0x66 = Mackie",
+    "device_id": 20,
+    "_comment_device": "0x14 = Mackie Control",
+    "subids": {
+      "lcd_display": 18,
+      "_comment_lcd": "0x12 — 56-Zeichen LCD, zwei Reihen à 56",
+      "two_char_display": 20,
+      "_comment_2char": "0x14 — Modus/Bank-Anzeige",
+      "timecode_display": 16,
+      "_comment_tc": "0x10 — 10-stellige Zeitanzeige"
+    },
+    "header_lcd": [240, 0, 0, 102, 20, 18],
+    "header_2char": [240, 0, 0, 102, 20, 20],
+    "header_tc": [240, 0, 0, 102, 20, 16],
+    "terminator": 247
+  },
+  "buttons": {
+    "_comment": "Note On Velocity 0x7F=press, 0x00=release",
+    "rec_arm": { "start": 0, "end": 7, "_comment": "0x00–0x07 für Channel 1–8" },
+    "solo":    { "start": 8, "end": 15 },
+    "mute":    { "start": 16, "end": 23 },
+    "select":  { "start": 24, "end": 31, "_comment": "0x18–0x1F" },
+    "vpot_press": { "start": 32, "end": 39 },
+    "fader_touch": { "start": 104, "end": 112, "_comment": "0x68–0x70 inkl. Master" },
+    "bank_left": 46,
+    "bank_right": 47,
+    "channel_left": 48,
+    "channel_right": 49,
+    "flip": 50,
+    "global_view": 51,
+    "transport": {
+      "rewind": 91,
+      "fast_forward": 92,
+      "stop": 93,
+      "play": 94,
+      "record": 95
+    },
+    "mode": {
+      "track": 40,
+      "send": 41,
+      "pan": 42,
+      "plugin": 43,
+      "eq": 44,
+      "instrument": 45
+    }
+  },
+  "encoders": {
+    "_comment": "CC 0x10–0x17 = 16–23. Wert: Bit 6 = Richtung (1=CCW, 0=CW), Bits 0–5 = Speed",
+    "cc_start": 16,
+    "cc_end": 23,
+    "direction_mask": 64,
+    "speed_mask": 63
+  },
+  "faders": {
+    "_comment": "Pitch Bend pro Kanal, 14-Bit-Auflösung",
+    "channel_start": 0,
+    "channel_end": 7,
+    "master_channel": 8
+  },
+  "vu_meters": {
+    "_comment": "Channel Pressure: high nibble = Kanal (0–7), low nibble = Pegel (0–C, D=clip, E=overload, F=clip-clear)",
+    "message_type": "channel_pressure",
+    "channel_mask": 240,
+    "level_mask": 15,
+    "level_clip": 13,
+    "level_overload": 14,
+    "level_clip_clear": 15
+  },
+  "lcd": {
+    "_comment": "Zwei Reihen à 56 Zeichen. Offset 0–55 = Reihe 1, 56–111 = Reihe 2. Pro Kanal 7 Zeichen, 8 Kanäle pro Reihe.",
+    "rows": 2,
+    "row_width": 56,
+    "channels_per_row": 8,
+    "chars_per_channel": 7
+  }
+}

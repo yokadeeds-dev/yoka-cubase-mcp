@@ -1,0 +1,64 @@
+name: Selftests
+
+on:
+  push:
+    branches: [main, "mac-port", "dev*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  selftests:
+    name: Selftests on ${{ matrix.os }} (Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
+        exclude:
+          # Python 3.12 mit pywin32 hat manchmal Wheel-Issues — primär 3.11 als Reference
+          - os: windows-latest
+            python-version: "3.12"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          # python-rtmidi braucht oft portmidi/CoreMIDI — meist schon da
+          # Falls Wheel-Build scheitert, hier ergänzen
+          echo "macOS deps: nichts Extra nötig"
+
+      - name: Install system dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "Windows deps: nichts Extra nötig"
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install pywin32 (Windows only)
+        if: runner.os == 'Windows'
+        run: pip install pywin32
+
+      - name: Run selftests
+        run: python -m tests.selftests.listener_selftest
+
+      - name: Cubase command-map selftest (Drift-Guard fuer cubase_command_midi_map.json)
+        run: python -m tests.selftests.cubase_commands_selftest
+
+      - name: MCP-Server smoketest
+        # mcp_server_smoketest spawned einen Subprocess via stdio — sollte überall laufen
+        run: python -m tests.selftests.mcp_server_smoketest
+        timeout-minutes: 1
+        continue-on-error: true  # MCP-Smoketest ist nice-to-have, blockt aber nicht
