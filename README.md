@@ -22,6 +22,7 @@ Drei Bridge-Layer:
 - **Closed-Loop:** Jede Steuer-Aktion wartet auf das DAW-Echo und meldet `verified: true/false` — kein Hoffen, dass ein Befehl ankam.
 - **State-Mirror:** `get_daw_state` liefert jederzeit Mode, Transport, aktive Spur, 8 sichtbare Strips mit Volume/Mute/Solo/VU — ohne Screenshot.
 - **Voller Command-Zugriff:** Über die Hotkey-Whitelist (~450) hinaus sind via MIDI Remote alle ~1559 ungebundenen Cubase-Commands adressierbar.
+- **Plugin-Parameter-Steuerung:** Über `makeValueBinding` (Cubase MIDI Remote API) sind **alle vom Host veröffentlichten VST-Parameter** steuerbar — inkl. aller **Cubase-Stock-Plugins** (StudioEQ, Magneto 2, Squasher, Frequency, Compressor …), **unabhängig von plugin-internem MIDI-Learn**. Live verifiziert. *(Die Steuerung ist Free; das Wissen „welcher Wert klingt richtig" liefert das Premium-Add-On.)*
 - **Plattform-portierbar:** Windows produktiv getestet; macOS-Implementierung als Stub vorhanden.
 
 ## Architektur
