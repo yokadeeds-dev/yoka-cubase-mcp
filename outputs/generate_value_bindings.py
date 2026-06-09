@@ -68,7 +68,7 @@ CUBASE_MIDI_REMOTE_LOCAL = (
 
 PORT_NAME = "AI_VAL"
 NUM_SLOTS = 8          # Insert-Slots 0-7 -> Channel 1-8
-MAX_PARAMS = 48        # Param-Positionen je Slot -> CC 0-47 (deckt die gescannten Plugins)
+MAX_PARAMS = 64        # Param-Positionen je Slot -> CC 0-63 (deckt alle gescannten Plugins, inkl. Frequency 58 / Eventide 64)
 
 VENDOR = "KI Studio"
 DEVICE_NAME = "Value Remote"

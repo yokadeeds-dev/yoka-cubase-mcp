@@ -1,8 +1,8 @@
 # Drehbuch — KI-Studio MCP Demo-Lauf (v4)
 
-> ⭐ **Free vs. Premium:** Mackie-Steuerung, AHK (~450 Cubase-Commands), MIDI-Recording **und Plugin-Parameter-Steuerung** sind im **Free-Core** (`yoka-cubase-mcp`). Schritte, die das Mixing/Mastering-**Wissen** nutzen (`nicker_*`: Mastering-Chains, EQ-/Masking-Advice, Audio-Bewertung), gehören zum **Premium-Add-On** [yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium). Kurz: **Parameter *bewegen* = Free · *wissen welcher Wert richtig ist* = Premium.**
+> ⭐ **Free vs. Premium (Cut-Line 2026-06-10):** **Free = generische Mechanik + Standards.** Mackie-Steuerung, MIDI-Recording, die AHK-Bridge-Mechanik und die **generische** Plugin-Parameter-Steuerung (das plugin-agnostische `ki_studio_value_remote.js` + Generatoren + Scanner) sind im **Free-Core** (`yoka-cubase-mcp`) — dazu die **Cubase-Standard-Commands** (die 656 mit eigenem Hotkey, die Cubase ohnehin kennt) und eine **Demo-Plugin-Map mit 2 echten Stock-Plugins je Kategorie**. **Premium** (`yoka-cubase-premium`): die **volle Command-Belegung** (alle 1559 vormals nicht-zugewiesenen Commands per Hotkey/MIDI), die **volle Plugin-Abdeckung** (komplette gescannte Map) und das Mixing/Mastering-**Wissen** (`nicker_*`). Kurz: **Mechanik + Standards + Demo = Free · volle Belegung + volle Abdeckung + welcher Wert richtig ist = Premium.**
 
-> **v5 (2026-06-09):** Plugin-Value-Bindings live — **alle Steinberg-Stock-VST auf allen Parametern steuerbar** (StudioEQ, Magneto 2, Squasher, Frequency, Compressor …) über die Cubase MIDI Remote API (`makeValueBinding`), unabhängig von plugin-internem MIDI-Learn. Live verifiziert: KI bewegte StudioEQ „1 Gain". **Das ist Free-Mechanik** (siehe neue Stage G). Premium-Plugin-Schritte (Pro-Q3/Pro-C2 via Nicker-Preset) bleiben als Mastering-*Wissen* Premium.
+> **v5 (2026-06-09 / Cut korrigiert 2026-06-10):** Plugin-Value-Bindings live — die **Mechanik** macht jeden vom Host veröffentlichten VST-Parameter adressierbar (`makeValueBinding`, unabhängig von plugin-internem MIDI-Learn). Live verifiziert: KI bewegte StudioEQ „1 Gain". **Free liefert die generische Mechanik + 2 Demo-Stock-Plugins je Kategorie**; die **volle Plugin-Abdeckung** (alle gescannten Stock- und Drittanbieter-Plugins) ist **Premium**. Das Steuer-JS selbst ist plugin-agnostisch (0 Plugin-Namen) — es bleibt Free, weil reine Mechanik.
 
 > **v4 (2026-06-07):** Macro-Layer aktiviert. Take 2 nutzt jetzt `macro_*`-Trigger statt Dialog-Navigation. Setup-Phase schrumpft von 30 s auf 1 s. Hotkey-Whitelist im AHK-Bridge auf 52 Actions erweitert.
 
@@ -141,26 +141,25 @@
 
 ---
 
-## Take 3 — Stock-Plugin-Parameter-Steuerung (FREE, v5)
+## Take 3 — Plugin-Parameter-Steuerung: generische Mechanik (FREE) + Demo
 
-**Der eigentliche Durchbruch fürs Free-Paket.** Über die Cubase MIDI Remote API (`makeValueBinding`) sind **alle vom Host veröffentlichten VST-Parameter** adressierbar — **unabhängig von plugin-internem MIDI-Learn**. Damit werden die **Cubase-Stock-Plugins** erstmals KI-steuerbar (vorher tote Zone):
+**Free liefert die Mechanik, nicht die volle Abdeckung.** Über die Cubase MIDI Remote API (`makeValueBinding`) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das **Steuer-JS ist plugin-agnostisch** (generische Slot×Param→CC-Bindings, 0 Plugin-Namen) und damit Free. Was Free **nicht** mitliefert, ist die volle Plugin-Map:
 
-| Plugin-Klasse | vorher | jetzt (Free) |
+| | Free | Premium |
 |---|---|---|
-| Cubase-Stock (StudioEQ, Magneto 2, Squasher, Frequency, Compressor, …) | gar nicht | ✅ **alle Parameter** |
-| Drittanbieter ohne MIDI-Learn | gar nicht | ✅ alle Parameter |
-| FabFilter & Co. (mit Learn) | nur via Premium-Preset | ✅ auch direkt |
+| Generische Steuer-Mechanik (`ki_studio_value_remote.js`, Generator, Scanner) | ✅ | ✅ (Overlay) |
+| Plugin-Map | **Demo: 2 echte Stock-Plugins je Kategorie** | **volle Abdeckung** (alle gescannten Stock + Drittanbieter) |
+| „welcher Wert klingt richtig?" (Nicker-Wissen) | — | ✅ |
 
 **Live verifiziert (2026-06-09):** KI bewegte **StudioEQ „1 Gain"** (Cubase-Stock) — Wert fuhr sichtbar im Plugin-GUI.
 
 ### Demo-Choreografie
-- Stock-Plugin auf eine Spur (z. B. **StudioEQ**), GUI offen
-- Param-Scan (einmalig pro Plugin) → `cubase_plugin_param_map.json`
-- KI setzt einen Parameter (z. B. StudioEQ Band-1-Gain auf +4 dB) → **Wert fährt live im GUI**
+- Stock-Plugin aus der **Demo-Map** auf eine Spur (z. B. **StudioEQ** oder **Frequency**), GUI offen
+- KI setzt einen Parameter (z. B. StudioEQ Band-1-Gain) per `nicker_set_plugin_param` → **Wert fährt live im GUI**
 - A/B: zweiter Wert, zurück — sichtbar + hörbar
-- *Mechanik = Free.* Die Frage **„welcher Wert klingt nach Trip-Hop-Wärme?"** beantwortet das **Premium**-Wissen (Nicker) — die Steuerung selbst nicht.
+- *Mechanik + Demo-Plugins = Free.* Die **volle Plugin-Abdeckung** (eigener Scan deiner Plugins) sowie die Frage **„welcher Wert klingt nach Trip-Hop-Wärme?"** sind **Premium** (Nicker-Wissen) — bzw. der Nutzer scannt sein Sortiment selbst mit dem Free-Scanner.
 
-**Mechanismus:** Scan-Parser (`outputs/parse_param_scan.py`) erzeugt aus deinem Cubase-Plugin-Scan die **Param-Map** (`cubase_plugin_param_map.json` — *user-spezifisch, nicht mitgeliefert; du scannst deine eigenen Plugins*). Der Generator (`outputs/generate_value_bindings.py`) baut daraus das Steuer-JS (`runtime/midi_remote/ki_studio_value_remote.js`). Adressierung über Port `AI_VAL`, Channel = Insert-Slot. Details: [`specs/spec_2026_06_09_plugin_value_bindings.md`](../specs/spec_2026_06_09_plugin_value_bindings.md).
+**Mechanismus:** Der Free-Scanner (`outputs/parse_param_scan.py` + `ki_studio_param_scan.js`) erzeugt aus deinem eigenen Plugin-Scan eine **Param-Map**; der Generator (`outputs/generate_value_bindings.py`) baut daraus das generische Steuer-JS. **Free-Beileger:** `cubase_plugin_param_map_demo.json` (2 echte Stock-Plugins je Kategorie). Die **volle** `cubase_plugin_param_map.json` + `cubase_value_cc_map.json` sind nicht im Free-Repo. Adressierung über Port `AI_VAL`, Channel = Insert-Slot. Details: [`specs/spec_2026_06_09_plugin_value_bindings.md`](../specs/spec_2026_06_09_plugin_value_bindings.md).
 
 ---
 

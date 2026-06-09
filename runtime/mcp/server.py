@@ -1002,6 +1002,43 @@ _ALL_TOOLS: list[Tool] = [
             "additionalProperties": False,
         },
     ),
+    Tool(
+        name="nicker_set_plugin_param",
+        description=(
+            "Setzt einen Plugin-Parameter BY NAME per MIDI-CC — Cubase-Stock UND "
+            "Drittanbieter (129 Plugins gescannt), OHNE plugin-internes MIDI-Learn. "
+            "Loest (plugin, param) ueber cubase_value_cc_map.json zu einer CC auf und "
+            "sendet an Port AI_VAL. Adressierung: channel = insert_slot (0-7) der "
+            "SELEKTIERTEN Spur, cc = Parameter-Index, value 0-127 = Param-Min..Max. "
+            "Voraussetzung: loopMIDI-Port AI_VAL + ki_studio_value_remote.js aktiv in "
+            "Cubase; das Plugin liegt auf insert_slot der aktuell selektierten Spur. "
+            "param matcht role ('band1_gain'), title ('1 Gain') oder Param-Index. "
+            "Zone=yellow — schreibender Eingriff in Plugin-State."
+        ),
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "plugin": {
+                    "type": "string",
+                    "description": "Plugin-Name (object_title), z.B. 'StudioEQ', 'Frequency', 'Blackhole'. Exakt (case-insensitiv) oder eindeutiger Substring.",
+                },
+                "param": {
+                    "type": "string",
+                    "description": "Parameter: role ('band1_gain'), title ('1 Gain') oder Param-Index ('1').",
+                },
+                "value": {
+                    "type": "integer", "minimum": 0, "maximum": 127,
+                    "description": "CC-Wert 0-127 (0=Min, 64=Mitte, 127=Max).",
+                },
+                "insert_slot": {
+                    "type": "integer", "minimum": 0, "maximum": 7, "default": 0,
+                    "description": "Insert-Slot 0-7 der selektierten Spur (= MIDI-Channel). Default 0 = Insert 1.",
+                },
+            },
+            "required": ["plugin", "param", "value"],
+            "additionalProperties": False,
+        },
+    ),
     # ---- Voll-Command-Zugriff via MIDI Remote (jenseits Hotkey-Limit) ----
     Tool(
         name="send_cubase_command",
@@ -1450,6 +1487,7 @@ _PREMIUM_TOOL_NAMES: set[str] = {
     "nicker_send_midi_cc",
     "nicker_send_midi_cc_pct",
     "nicker_send_midi_cc_range",
+    "nicker_set_plugin_param",
     "nicker_list_midi_ports",
     "nicker_set_pro_q3_band",
     "nicker_set_pro_c2",
@@ -1727,6 +1765,40 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> list[TextCon
             verified=False,
             source="midi_send",
             error=(send.error if send and not send.ok else None),
+        ))
+
+    if name == "nicker_set_plugin_param":
+        from runtime.midi_bridge.plugin_values import resolve as _resolve_pp
+        info, err = _resolve_pp(str(args["plugin"]), str(args["param"]))
+        if err:
+            return _to_content(_envelope(
+                tool=name, ok=False, daw=daw,
+                requested={"plugin": args["plugin"], "param": args["param"]},
+                observed={}, verified=False, source="value_cc_map", error=err,
+            ))
+        slot = int(args.get("insert_slot", 0))
+        result = send_midi_cc(
+            cc=int(info["cc"]),
+            value=int(args["value"]),
+            port="AI_VAL",
+            channel=slot,
+        )
+        return _to_content(_envelope(
+            tool=name, ok=result.ok, daw=daw,
+            requested={
+                "plugin": info["plugin"], "param": args["param"],
+                "value": int(args["value"]), "insert_slot": slot,
+            },
+            observed={
+                "resolved_cc": info["cc"],
+                "resolved_title": info.get("title"),
+                "resolved_role": info.get("role"),
+                "channel": slot, "port_used": result.port_used,
+                "value_sent": result.value,
+            },
+            verified=False,  # MIDI ist fire-and-forget
+            source="midi_send",
+            error=result.error,
         ))
 
     if name == "send_midi_note":

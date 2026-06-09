@@ -43,11 +43,15 @@ var midiremote_api = require('midiremote_api_v1')
 
 var deviceDriver = midiremote_api.makeDeviceDriver('KI Studio', 'Param Scanner', 'KI Studio 2026')
 var midiInput = deviceDriver.mPorts.makeMidiInput()
+var midiOutput = deviceDriver.mPorts.makeMidiOutput()
 
-// Eigener Detection-Port AI_SCAN (NICHT AI_CMD — der ist exklusiv vom
-// Command-Remote belegt). Der Scanner empfaengt nichts darueber, braucht den
-// Match nur als Lade-/Verbindungs-Bedingung.
-deviceDriver.makeDetectionUnit().detectSingleInput(midiInput).expectInputNameContains('AI_SCAN')
+// Detection als Port-Paar: Input AI_SCAN (Lade-Bedingung, NICHT AI_CMD — der ist
+// exklusiv vom Command-Remote belegt) + Output AI_RETURN (SysEx-Auto-Export an
+// den Python-Listener). Output-Name bewusst OHNE 'AI_SCAN'-Substring, sonst
+// wuerde expectInputNameContains('AI_SCAN') auch den Output-Port matchen.
+deviceDriver.makeDetectionUnit().detectPortPair(midiInput, midiOutput)
+    .expectInputNameContains('AI_SCAN')
+    .expectOutputNameContains('AI_RETURN')
 
 var surface = deviceDriver.mSurface
 var page = deviceDriver.mMapping.makePage('Scan')
@@ -58,22 +62,32 @@ var sel = page.mHostAccess.mTrackSelection.mMixerChannel
 // alle gaengigen Stock-Plugins (Magneto 2 ~10, StudioEQ ~12, Compressor ~10,
 // Frequency/Squasher mehr). Bei Bedarf erhoehen — kostet nur Scan-Last.
 var SCAN_SLOTS = 8
-var SCAN_BANK_SIZE = 48
+var SCAN_BANK_SIZE = 64   // 64 deckt auch grosse Multiband-/Amp-Plugins (48 schnitt Squasher/MultibandExpander ab)
+
+// Sendet eine ASCII-Zeile als SysEx (7-bit-clamp je Zeichen) an AI_SCAN_OUT.
+// Payload = exakt die [PARAMSCAN]-Zeile, damit der Python-Listener sie 1:1 in
+// die .txt schreibt und der bestehende Parser (LINE_RE) sie unveraendert frisst.
+function sendSysexLine(activeDevice, text) {
+    var bytes = [0xF0]
+    for (var c = 0; c < text.length; c++) {
+        bytes.push(text.charCodeAt(c) & 0x7F)
+    }
+    bytes.push(0xF7)
+    midiOutput.sendMidi(activeDevice, bytes)
+}
 
 // Factory bindet slot/idx fest in die Closure (ES5: var-Closures wuerden sonst
 // nur den letzten Schleifenwert sehen).
 function makeTitleLogger(slot, idx) {
     return function (activeDevice, objectTitle, valueTitle) {
         // Leere Titel = Position jenseits der echten Param-Zahl des Plugins.
-        // Trotzdem loggen waere Rauschen — der Parser filtert leere ohnehin,
-        // aber wir sparen Console-Spam, indem wir leere objectTitle ueberspringen.
         if (!objectTitle && !valueTitle) { return }
-        console.log(
-            '[PARAMSCAN] slot=' + slot +
-            ' idx=' + idx +
-            ' obj="' + objectTitle + '"' +
-            ' val="' + valueTitle + '"'
-        )
+        var line = '[PARAMSCAN] slot=' + slot +
+                   ' idx=' + idx +
+                   ' obj="' + objectTitle + '"' +
+                   ' val="' + valueTitle + '"'
+        console.log(line)                  // GUI-Konsole (Fallback/Debug)
+        sendSysexLine(activeDevice, line)  // Auto-Export an Python-Listener
     }
 }
 
