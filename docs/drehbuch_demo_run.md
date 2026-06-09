@@ -1,5 +1,7 @@
 # Drehbuch — KI-Studio MCP Demo-Lauf (v4)
 
+> ⭐ **Free vs. Premium:** Dieses Drehbuch zeigt den vollen Stack inkl. Mixing/Mastering. **Take 1 (Mackie) und die AHK-/MIDI-Steuerung sind im Free-Core (`yoka-cubase-mcp`) enthalten.** Schritte mit `nicker_*`-Tools, Plugin-CC (Pro-Q3/Pro-C2) und Mastering-Choreografie gehören zum **Premium-Add-On** [yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium) — sie sind hier markiert/erwähnt, laufen im Free-Build aber nicht (die Tools sind dann ausgeblendet).
+
 > **v4 (2026-06-07):** Macro-Layer aktiviert. Take 2 nutzt jetzt `macro_*`-Trigger statt Dialog-Navigation. Setup-Phase schrumpft von 30 s auf 1 s. Hotkey-Whitelist im AHK-Bridge auf 52 Actions erweitert.
 
 **Zweck:** Vollständige autonome Demo, sichtbar als Split-Screen-Take (Cubase links · Chat rechts), in **zwei Phasen**: Mackie-Take (reine Bidirektionalitäts-Beweise) + AHK-Hybrid-Take (Substanz schaffen → bespielen → animieren).
