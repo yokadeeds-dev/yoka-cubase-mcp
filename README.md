@@ -15,14 +15,14 @@ Drei Bridge-Layer:
 | Layer | Macht | Kanal |
 |---|---|---|
 | **Mackie (MCU)** | Mode, Track-Select, Volume, Transport, Plugin-Pages — **closed-loop-verifiziert** | MIDI via loopMIDI/IAC |
-| **AHK** | ~450 whitelisted Cubase-Commands + Macros (Transport, Edit, MIDI, Quantize, Record-Arm …) | synthetische Keystrokes |
-| **MIDI-Send** | Note-On/Off für Recording, voller Command-Zugriff via Cubase MIDI Remote API (1559 Commands) | MIDI via loopMIDI |
+| **AHK** | Hotkey-Bridge für Cubase-**Standard-Commands** (die mit eigenem Hotkey) + Macros | synthetische Keystrokes |
+| **MIDI-Send** | Note-On/Off für Recording + generische Command-/Plugin-Steuer-Mechanik via Cubase MIDI Remote API | MIDI via loopMIDI |
 
 **Kerneigenschaften:**
 - **Closed-Loop:** Jede Steuer-Aktion wartet auf das DAW-Echo und meldet `verified: true/false` — kein Hoffen, dass ein Befehl ankam.
 - **State-Mirror:** `get_daw_state` liefert jederzeit Mode, Transport, aktive Spur, 8 sichtbare Strips mit Volume/Mute/Solo/VU — ohne Screenshot.
-- **Voller Command-Zugriff:** Über die Hotkey-Whitelist (~450) hinaus sind via MIDI Remote alle ~1559 ungebundenen Cubase-Commands adressierbar.
-- **Plugin-Parameter-Steuerung:** Über `makeValueBinding` (Cubase MIDI Remote API) sind **alle vom Host veröffentlichten VST-Parameter** steuerbar — inkl. aller **Cubase-Stock-Plugins** (StudioEQ, Magneto 2, Squasher, Frequency, Compressor …), **unabhängig von plugin-internem MIDI-Learn**. Live verifiziert. *(Die Steuerung ist Free; das Wissen „welcher Wert klingt richtig" liefert das Premium-Add-On.)*
+- **Command-Steuerung (Standards + Mechanik):** Cubase-**Standard-Commands** (die einen eigenen Hotkey haben) sind direkt nutzbar. Die **Generatoren** für die volle MIDI-Remote-Command-Belegung liegen bei (`generate_cubase_midi_remote.py`) — die **vorgefertigte volle Belegung** aller ~1559 ungebundenen Commands ist Teil des **Premium-Add-Ons**.
+- **Plugin-Parameter-Steuerung (generische Mechanik):** Über `makeValueBinding` (Cubase MIDI Remote API) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das **Steuer-JS ist plugin-agnostisch** und liegt bei, dazu ein **Scanner** (für eigene Plugins) und eine **Demo-Map mit 2 echten Stock-Plugins je Kategorie**. Live verifiziert (KI bewegte StudioEQ „1 Gain"). Die **volle Plugin-Abdeckung** und das Wissen „welcher Wert klingt richtig" liefert das **Premium-Add-On**.
 - **Plattform-portierbar:** Windows produktiv getestet; macOS-Implementierung als Stub vorhanden.
 
 ## Architektur
@@ -59,8 +59,8 @@ Drei Bridge-Layer:
 | **State (read-only)** | `get_daw_state`, `get_active_track`, `get_active_plugin`, `list_tracks`, `list_connected_daws` | grün |
 | **Mackie-Steuerung** | `set_mode`, `select_track`, `bank_left/right`, `channel_left/right`, `transport_play/stop`, `plugin_page_next/prev` | gelb |
 | **Volume** | `set_track_volume`, `set_track_volume_db` | gelb |
-| **AHK** | `ahk_list_actions`, `ahk_send_action` (~450 Cubase-Commands + Macros), `save_project`, `undo`, `redo` | gelb/rot |
-| **MIDI-Send** | `send_midi_note`, `send_midi_note_sequence`, `send_cubase_command` (Voll-Command-Zugriff) | gelb |
+| **AHK** | `ahk_list_actions`, `ahk_send_action` (Cubase-Standard-Commands + Macros), `save_project`, `undo`, `redo` | gelb/rot |
+| **MIDI-Send** | `send_midi_note`, `send_midi_note_sequence`, `send_cubase_command` (Command-by-name — volle Belegungs-Map = Premium) | gelb |
 | **Session-Log** | `start_session_log`, `get_session_summary`, `get_session_report` | grün |
 | **Cubase-Inspector** | `validate_cubase_port_setup`, `list_cubase_audio_drivers` | grün |
 | **Transport (aufnehmend)** | `transport_record` | rot |
@@ -70,11 +70,13 @@ Drei Bridge-Layer:
 
 ## ⭐ Premium-Add-On: Nicker (Mixing/Mastering-Wissen)
 
-Dieser Kern steuert die DAW. Das optionale **[yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium)**-Add-On macht daraus einen **KI-Mixing/Mastering-Kollegen** — ~30 zusätzliche `nicker_*`-Tools:
+Dieser Kern liefert die **generische Steuer-Mechanik + Cubase-Standards + eine Demo-Plugin-Map**. Das optionale **[yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium)**-Add-On ergänzt die **volle Belegung + Abdeckung + das Mixing/Mastering-Wissen**:
 
+- **Volle Command-Belegung:** alle ~1559 vormals nicht-zugewiesenen Cubase-Commands fertig per Hotkey/MIDI gemappt (statt nur der Standards)
+- **Volle Plugin-Abdeckung:** komplette gescannte Param-/CC-Map (alle Stock- + Drittanbieter-Plugins) statt nur 2 Demo-Plugins je Kategorie
 - Audio-Analyse (LUFS / Spektrum / True-Peak)
 - Mastering-Chain-Empfehlungen pro Genre × Plattform
-- EQ-/Masking-Advice pro Track-Rolle
+- EQ-/Masking-Advice pro Track-Rolle, `nicker_*`-Tools (~30)
 - FabFilter Pro-Q3 / Pro-C2 per MIDI-Learn setzen
 - Traktor-Deck-Observer, DAWproject-Writer
 
@@ -87,9 +89,9 @@ yoka-cubase-mcp/
 ├── README.md · LICENSE (MIT) · requirements.txt
 ├── runtime/
 │   ├── mackie/        ← MCU-Kern: parser, state, listener, sender, closedloop, units
-│   ├── ahk/           ← Hotkey-Bridge + ~450 generierte Cubase-Command-Actions
-│   ├── midi_bridge/   ← Note-Send + Command-MIDI-Remote-Map
-│   ├── midi_remote/   ← Cubase-MIDI-Remote-Script (1559 Commands)
+│   ├── ahk/           ← Hotkey-Bridge-Mechanik (Standard-Commands; volle Patch-Map = Premium)
+│   ├── midi_bridge/   ← Note-Send + Command-Resolver + Demo-Plugin-Map (volle Maps = Premium)
+│   ├── midi_remote/   ← Cubase-MIDI-Remote-Scripts (generisch: Command- + Value-Steuer-JS)
 │   ├── osc/           ← OSC-Bridge
 │   ├── setup/         ← Cubase Port-Setup-Parser
 │   ├── audio/         ← Playback
@@ -147,8 +149,8 @@ Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze d
 | Mackie-Listener + Parser + State-Mirror | ✅ produktiv |
 | Sender + Closed-Loop-Verifikation | ✅ produktiv |
 | MCP-Server (33 Core-Tools) | ✅ produktiv |
-| AHK-Bridge (~450 Cubase-Commands + Macros) | ✅ produktiv |
-| Voll-Command-Zugriff (MIDI Remote, 1559) | ✅ live verifiziert |
+| AHK-Bridge-Mechanik (Standard-Commands + Macros) | ✅ produktiv |
+| Generische Command-/Plugin-Steuer-Mechanik (MIDI Remote) | ✅ live verifiziert (volle Belegungs-/Plugin-Maps = Premium) |
 | MIDI-Note-Recording (autonom) | ✅ end-to-end verifiziert |
 | macOS-Port | ⏳ Stub, ungetestet |
 
