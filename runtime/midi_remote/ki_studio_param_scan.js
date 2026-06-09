@@ -9,7 +9,7 @@
 // Die Ausgabe ist die Roh-Quelle fuer outputs/parse_param_scan.py, das daraus
 // runtime/midi_bridge/cubase_plugin_param_map.json erzeugt — analog zur
 // Command-Map (cubase_command_midi_map.json). Aus der Param-Map generiert dann
-// der (Codex-)Value-Binding-Generator das eigentliche Steuer-JS.
+// der Value-Binding-Generator das eigentliche Steuer-JS.
 //
 // WARUM SO: Die MIDI Remote API ist gesandboxt (kein File-IO). Param-Titel sind
 // nur zur Laufzeit ueber mOnTitleChange eines an den Host-Parameter gebundenen
