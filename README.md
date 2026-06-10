@@ -80,6 +80,8 @@ Dieser Kern liefert die **generische Steuer-Mechanik + Cubase-Standards + eine D
 - FabFilter Pro-Q3 / Pro-C2 per MIDI-Learn setzen
 - Traktor-Deck-Observer, DAWproject-Writer
 
+**Zugang:** über **[GitHub Sponsors](https://github.com/sponsors/yokadeeds-dev)** — ab dem **Producer-Tier (15 €/Monat)** automatischer Zugriff auf den privaten Premium-Repo inkl. aller Updates ([Tiers](SPONSORS.md)).
+
 Der Server erkennt das Add-On automatisch (`_premium_in_same_runtime()`). Ohne Add-On läuft er als Free-Build: die Steuer-Tools (`nicker_send_midi_cc`, `nicker_set_plugin_param` mit Demo-CC-Map) bleiben aktiv, die `nicker_*`-Wissens-Tools (Audio/Mastering/EQ/Registry) sind ausgeblendet.
 
 ## Repo-Struktur
