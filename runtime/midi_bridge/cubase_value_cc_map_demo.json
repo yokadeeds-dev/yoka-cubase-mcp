@@ -1,0 +1,916 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-06-10",
+  "generated_from": "runtime/midi_bridge/cubase_plugin_param_map.json",
+  "source_sha256": "ad7907f9207dd5a473348b3b71c2d3a9df60d91c92b378c24a1ad0dc663e4531",
+  "transport": "midi_remote_api",
+  "addressing": {
+    "port": "AI_VAL",
+    "channel": "1-8 (API 0-7) = Insert-Slot 0-7 der selektierten Spur",
+    "cc": "0-63 = Parameter-Index im Slot",
+    "channel_from_slot": "channel = insert_slot + 1 (zur Laufzeit, je nachdem wo das Plugin liegt)",
+    "max_params": 64,
+    "rule": "Steuere Plugin-Param: sende auf Channel=(Slot+1), CC=param_index. Wert 0-127 = Param 0..100%."
+  },
+  "num_slots": 8,
+  "plugin_count": 10,
+  "plugins": {
+    "AutoFilter": {
+      "param_count": 11,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Type"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Freq"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Resonance"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Auto-Manual"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "Range"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "Attack"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "Release"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Bypass"
+        },
+        {
+          "param_index": 12,
+          "cc": 12,
+          "title": "Gate"
+        },
+        {
+          "param_index": 14,
+          "cc": 14,
+          "title": "Mix"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Output"
+        }
+      ]
+    },
+    "Chorus": {
+      "param_count": 11,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Rate"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Sync On"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Sy Note"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Shape"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "Delay"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "Width"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "Spatial"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Mix"
+        },
+        {
+          "param_index": 8,
+          "cc": 8,
+          "title": "Lo Filter"
+        },
+        {
+          "param_index": 10,
+          "cc": 10,
+          "title": "Hi Filter"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "Compressor": {
+      "param_count": 13,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Threshold"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Ratio"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Attack"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Release"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "AutoRelease"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "Hold"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "MakeUp"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "AutoMakeUp"
+        },
+        {
+          "param_index": 8,
+          "cc": 8,
+          "title": "Soft Knee"
+        },
+        {
+          "param_index": 9,
+          "cc": 9,
+          "title": "High Ratio"
+        },
+        {
+          "param_index": 13,
+          "cc": 13,
+          "title": "Peak-RMS"
+        },
+        {
+          "param_index": 14,
+          "cc": 14,
+          "title": "Dry Mix"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "Magneto II": {
+      "param_count": 10,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Sat-On"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Saturation"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Lo Freq"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Hi Freq"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "HF-On"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "HFAdjust"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "Dual-On"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Output"
+        },
+        {
+          "param_index": 13,
+          "cc": 13,
+          "title": "Solo On"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "Pitch Correct": {
+      "param_count": 11,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Speed"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Tolerance"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Transp"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "FrmShift"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "Optimize"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "FmPreserv"
+        },
+        {
+          "param_index": 8,
+          "cc": 8,
+          "title": "MidiMode"
+        },
+        {
+          "param_index": 9,
+          "cc": 9,
+          "title": "Scale"
+        },
+        {
+          "param_index": 10,
+          "cc": 10,
+          "title": "Key"
+        },
+        {
+          "param_index": 13,
+          "cc": 13,
+          "title": "MastTune"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "REVerence": {
+      "param_count": 36,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Time"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Pre Dly"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Size"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Level"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "ER-TSplit"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "ER-TMix"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "Mix"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Output"
+        },
+        {
+          "param_index": 8,
+          "cc": 8,
+          "title": "R Time"
+        },
+        {
+          "param_index": 9,
+          "cc": 9,
+          "title": "R P-Dly"
+        },
+        {
+          "param_index": 10,
+          "cc": 10,
+          "title": "R Size"
+        },
+        {
+          "param_index": 11,
+          "cc": 11,
+          "title": "R Level"
+        },
+        {
+          "param_index": 12,
+          "cc": 12,
+          "title": "RERTSplit"
+        },
+        {
+          "param_index": 13,
+          "cc": 13,
+          "title": "RERTMix"
+        },
+        {
+          "param_index": 14,
+          "cc": 14,
+          "title": "Mix"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        },
+        {
+          "param_index": 16,
+          "cc": 16,
+          "title": "Reverse"
+        },
+        {
+          "param_index": 17,
+          "cc": 17,
+          "title": "Trim On"
+        },
+        {
+          "param_index": 18,
+          "cc": 18,
+          "title": "TrStart"
+        },
+        {
+          "param_index": 19,
+          "cc": 19,
+          "title": "Tr End"
+        },
+        {
+          "param_index": 20,
+          "cc": 20,
+          "title": "TMinLev"
+        },
+        {
+          "param_index": 22,
+          "cc": 22,
+          "title": "Au-Gain"
+        },
+        {
+          "param_index": 23,
+          "cc": 23,
+          "title": "Pres-Nr"
+        },
+        {
+          "param_index": 24,
+          "cc": 24,
+          "title": "EQ On"
+        },
+        {
+          "param_index": 25,
+          "cc": 25,
+          "title": "LoF On"
+        },
+        {
+          "param_index": 26,
+          "cc": 26,
+          "title": "LoF Frq"
+        },
+        {
+          "param_index": 27,
+          "cc": 27,
+          "title": "LoFGain"
+        },
+        {
+          "param_index": 29,
+          "cc": 29,
+          "title": "MID On"
+        },
+        {
+          "param_index": 30,
+          "cc": 30,
+          "title": "MID Frq"
+        },
+        {
+          "param_index": 31,
+          "cc": 31,
+          "title": "MIDGain"
+        },
+        {
+          "param_index": 33,
+          "cc": 33,
+          "title": "HiF On"
+        },
+        {
+          "param_index": 34,
+          "cc": 34,
+          "title": "HiF Frq"
+        },
+        {
+          "param_index": 35,
+          "cc": 35,
+          "title": "HiFGain"
+        },
+        {
+          "param_index": 37,
+          "cc": 37,
+          "title": "Mix"
+        },
+        {
+          "param_index": 38,
+          "cc": 38,
+          "title": "Output"
+        },
+        {
+          "param_index": 39,
+          "cc": 39,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "StereoDelay": {
+      "param_count": 28,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "1 Delay"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "1SyncOn"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "1SyNote"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "1 Feedback"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "1 Pan"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "1 Mix"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Bypass"
+        },
+        {
+          "param_index": 8,
+          "cc": 8,
+          "title": "1LoF On"
+        },
+        {
+          "param_index": 9,
+          "cc": 9,
+          "title": "1LoF Frq"
+        },
+        {
+          "param_index": 11,
+          "cc": 11,
+          "title": "1HiF On"
+        },
+        {
+          "param_index": 12,
+          "cc": 12,
+          "title": "1HiF Frq"
+        },
+        {
+          "param_index": 13,
+          "cc": 13,
+          "title": "1 Pan"
+        },
+        {
+          "param_index": 14,
+          "cc": 14,
+          "title": "1 Mix"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        },
+        {
+          "param_index": 16,
+          "cc": 16,
+          "title": "2 Delay"
+        },
+        {
+          "param_index": 17,
+          "cc": 17,
+          "title": "2SyncOn"
+        },
+        {
+          "param_index": 18,
+          "cc": 18,
+          "title": "2SyNote"
+        },
+        {
+          "param_index": 19,
+          "cc": 19,
+          "title": "2 Feedback"
+        },
+        {
+          "param_index": 21,
+          "cc": 21,
+          "title": "2 Pan"
+        },
+        {
+          "param_index": 22,
+          "cc": 22,
+          "title": "2 Mix"
+        },
+        {
+          "param_index": 23,
+          "cc": 23,
+          "title": "Bypass"
+        },
+        {
+          "param_index": 24,
+          "cc": 24,
+          "title": "2LoF On"
+        },
+        {
+          "param_index": 25,
+          "cc": 25,
+          "title": "2LoF Frq"
+        },
+        {
+          "param_index": 27,
+          "cc": 27,
+          "title": "2HiF On"
+        },
+        {
+          "param_index": 28,
+          "cc": 28,
+          "title": "2HiF Frq"
+        },
+        {
+          "param_index": 29,
+          "cc": 29,
+          "title": "2 Pan"
+        },
+        {
+          "param_index": 30,
+          "cc": 30,
+          "title": "2 Mix"
+        },
+        {
+          "param_index": 31,
+          "cc": 31,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "StereoEnhancer": {
+      "param_count": 7,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Width"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Mon-Out"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "DelayOn"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Delay"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "ColorOn"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "Color"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "StudioEQ": {
+      "param_count": 32,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "1 Freq"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "1 Gain"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "2 Freq"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "2 Gain"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "3 Freq"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "3 Gain"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "4 Freq"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "4 Gain"
+        },
+        {
+          "param_index": 8,
+          "cc": 8,
+          "title": "1 Bd On"
+        },
+        {
+          "param_index": 9,
+          "cc": 9,
+          "title": "1 Freq"
+        },
+        {
+          "param_index": 10,
+          "cc": 10,
+          "title": "1 Gain"
+        },
+        {
+          "param_index": 11,
+          "cc": 11,
+          "title": "1 Q"
+        },
+        {
+          "param_index": 12,
+          "cc": 12,
+          "title": "1 Type"
+        },
+        {
+          "param_index": 13,
+          "cc": 13,
+          "title": "Auto-Gn"
+        },
+        {
+          "param_index": 14,
+          "cc": 14,
+          "title": "MainOutput"
+        },
+        {
+          "param_index": 15,
+          "cc": 15,
+          "title": "Bypass"
+        },
+        {
+          "param_index": 16,
+          "cc": 16,
+          "title": "2 Bd On"
+        },
+        {
+          "param_index": 17,
+          "cc": 17,
+          "title": "2 Freq"
+        },
+        {
+          "param_index": 18,
+          "cc": 18,
+          "title": "2 Gain"
+        },
+        {
+          "param_index": 19,
+          "cc": 19,
+          "title": "2 Q"
+        },
+        {
+          "param_index": 20,
+          "cc": 20,
+          "title": "3 Bd On"
+        },
+        {
+          "param_index": 21,
+          "cc": 21,
+          "title": "3 Freq"
+        },
+        {
+          "param_index": 22,
+          "cc": 22,
+          "title": "3 Gain"
+        },
+        {
+          "param_index": 23,
+          "cc": 23,
+          "title": "3 Q"
+        },
+        {
+          "param_index": 24,
+          "cc": 24,
+          "title": "4 Bd On"
+        },
+        {
+          "param_index": 25,
+          "cc": 25,
+          "title": "4 Freq"
+        },
+        {
+          "param_index": 26,
+          "cc": 26,
+          "title": "4 Gain"
+        },
+        {
+          "param_index": 27,
+          "cc": 27,
+          "title": "4 Q"
+        },
+        {
+          "param_index": 28,
+          "cc": 28,
+          "title": "4 Type"
+        },
+        {
+          "param_index": 29,
+          "cc": 29,
+          "title": "Auto-Gn"
+        },
+        {
+          "param_index": 30,
+          "cc": 30,
+          "title": "MainOutput"
+        },
+        {
+          "param_index": 31,
+          "cc": 31,
+          "title": "Bypass"
+        }
+      ]
+    },
+    "Tuner": {
+      "param_count": 8,
+      "pagination_period": null,
+      "params": [
+        {
+          "param_index": 0,
+          "cc": 0,
+          "title": "Mute"
+        },
+        {
+          "param_index": 1,
+          "cc": 1,
+          "title": "Locked"
+        },
+        {
+          "param_index": 2,
+          "cc": 2,
+          "title": "Base"
+        },
+        {
+          "param_index": 3,
+          "cc": 3,
+          "title": "Oct"
+        },
+        {
+          "param_index": 4,
+          "cc": 4,
+          "title": "Note"
+        },
+        {
+          "param_index": 5,
+          "cc": 5,
+          "title": "Cent"
+        },
+        {
+          "param_index": 6,
+          "cc": 6,
+          "title": "Strobe"
+        },
+        {
+          "param_index": 7,
+          "cc": 7,
+          "title": "Bypass"
+        }
+      ]
+    }
+  },
+  "kind": "demo",
+  "source": "cubase_plugin_param_map_demo.json (1 Stock-Plugin je Kategorie)"
+}

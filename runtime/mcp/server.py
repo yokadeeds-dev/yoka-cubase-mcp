@@ -1484,11 +1484,10 @@ _PREMIUM_TOOL_NAMES: set[str] = {
     "nicker_freq_advice",
     "nicker_list_freq_track_roles",
     "nicker_find_masking_conflicts",
-    "nicker_send_midi_cc",
-    "nicker_send_midi_cc_pct",
-    "nicker_send_midi_cc_range",
-    "nicker_set_plugin_param",
-    "nicker_list_midi_ports",
+    # Generische Steuer-Mechanik = Free (abgespeckt: Plugin-Steuerung greift via
+    # plugin_values.py auf die Demo-CC-Map zurueck, 1 Stock-Plugin je Kategorie):
+    #   nicker_send_midi_cc(_pct/_range), nicker_set_plugin_param, nicker_list_midi_ports
+    #   -> bewusst NICHT in dieser Premium-Liste.
     "nicker_set_pro_q3_band",
     "nicker_set_pro_c2",
     "nicker_apply_preset",
