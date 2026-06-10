@@ -8,7 +8,7 @@
 
 ## Was das ist
 
-Ein **MCP-Server mit 33 Tools**, ansprechbar von Claude Code (oder jedem MCP-Client) aus. Die zentrale Idee: Statt eine DAW per fragiler UI-Automation oder geschlossener Hersteller-API zu steuern, sprechen wir das **MCU-Protokoll** — dasselbe, das physische Mixer-Controller (Mackie Control, Behringer X-Touch) seit 30 Jahren nutzen. Jede MCU-fähige DAW versteht es nativ, bidirektional und in Echtzeit.
+Ein **MCP-Server mit 40 Tools**, ansprechbar von Claude Code (oder jedem MCP-Client) aus. Die zentrale Idee: Statt eine DAW per fragiler UI-Automation oder geschlossener Hersteller-API zu steuern, sprechen wir das **MCU-Protokoll** — dasselbe, das physische Mixer-Controller (Mackie Control, Behringer X-Touch) seit 30 Jahren nutzen. Jede MCU-fähige DAW versteht es nativ, bidirektional und in Echtzeit.
 
 Drei Bridge-Layer:
 
@@ -22,7 +22,7 @@ Drei Bridge-Layer:
 - **Closed-Loop:** Jede Steuer-Aktion wartet auf das DAW-Echo und meldet `verified: true/false` — kein Hoffen, dass ein Befehl ankam.
 - **State-Mirror:** `get_daw_state` liefert jederzeit Mode, Transport, aktive Spur, 8 sichtbare Strips mit Volume/Mute/Solo/VU — ohne Screenshot.
 - **Command-Steuerung (Standards + Mechanik):** Cubase-**Standard-Commands** (die einen eigenen Hotkey haben) sind direkt nutzbar. Die **Generatoren** für die volle MIDI-Remote-Command-Belegung liegen bei (`generate_cubase_midi_remote.py`) — die **vorgefertigte volle Belegung** aller ~1559 ungebundenen Commands ist Teil des **Premium-Add-Ons**.
-- **Plugin-Parameter-Steuerung (generische Mechanik):** Über `makeValueBinding` (Cubase MIDI Remote API) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das **Steuer-JS ist plugin-agnostisch** und liegt bei, dazu ein **Scanner** (für eigene Plugins), die **Generatoren** und eine **Demo-Map mit 2 echten Stock-Plugins je Kategorie** — als Baukasten (per `send_cc.py`/eigenem Skript nutzbar). Live verifiziert (KI bewegte StudioEQ „1 Gain"). Die komfortablen **`nicker_*`-MCP-Steuer-Tools** (`nicker_set_plugin_param` by name), die **volle Plugin-Abdeckung** und das Wissen „welcher Wert klingt richtig" liefert das **Premium-Add-On**.
+- **Plugin-Parameter-Steuerung (abgespeckt):** Über `makeValueBinding` (Cubase MIDI Remote API) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das MCP-Tool **`nicker_set_plugin_param`** (Plugin by name) ist **im Free dabei** — abgespeckt auf **1 echtes Stock-Plugin je Kategorie** (Demo-CC-Map: StudioEQ, Compressor, Magneto II, AutoFilter, Chorus, StereoDelay, REVerence, Pitch Correct, StereoEnhancer, Tuner). Plus rohe CC-Steuerung (`nicker_send_midi_cc`), Scanner + Generatoren für eigene Plugins. Live verifiziert (KI bewegte StudioEQ „1 Gain"). Die **volle Plugin-Abdeckung** (alle Plugins) und das Wissen „welcher Wert klingt richtig" liefert das **Premium-Add-On**.
 - **Plattform-portierbar:** Windows produktiv getestet; macOS-Implementierung als Stub vorhanden.
 
 ## Architektur
@@ -31,7 +31,7 @@ Drei Bridge-Layer:
 ┌─────────────────────────────────────────────────────────────┐
 │  Claude Code (oder anderer MCP-Client)                       │
 └──────────────────────┬──────────────────────────────────────┘
-                       │ stdio MCP-Protokoll · 33 Tools
+                       │ stdio MCP-Protokoll · 40 Tools
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  yoka-cubase-mcp MCP-Server                                  │
@@ -52,7 +52,7 @@ Drei Bridge-Layer:
 └─────────────────────────────────────────────┘
 ```
 
-## Tools-Übersicht (33)
+## Tools-Übersicht (40)
 
 | Gruppe | Beispiele | Zone |
 |---|---|---|
@@ -60,7 +60,7 @@ Drei Bridge-Layer:
 | **Mackie-Steuerung** | `set_mode`, `select_track`, `bank_left/right`, `channel_left/right`, `transport_play/stop`, `plugin_page_next/prev` | gelb |
 | **Volume** | `set_track_volume`, `set_track_volume_db` | gelb |
 | **AHK** | `ahk_list_actions`, `ahk_send_action` (Cubase-Standard-Commands + Macros), `save_project`, `undo`, `redo` | gelb/rot |
-| **MIDI-Send** | `send_midi_note`, `send_midi_note_sequence`, `send_cubase_command` (Command-by-name — volle Belegungs-Map = Premium) | gelb |
+| **MIDI-Send + Plugin** | `send_midi_note(_sequence)`, `send_cubase_command` (Command by name — volle Map = Premium), `nicker_send_midi_cc(_pct/_range)`, `nicker_set_plugin_param` (1 Stock-Plugin/Kategorie; volle Abdeckung = Premium) | gelb |
 | **Session-Log** | `start_session_log`, `get_session_summary`, `get_session_report` | grün |
 | **Cubase-Inspector** | `validate_cubase_port_setup`, `list_cubase_audio_drivers` | grün |
 | **Transport (aufnehmend)** | `transport_record` | rot |
@@ -70,17 +70,17 @@ Drei Bridge-Layer:
 
 ## ⭐ Premium-Add-On: Nicker (Mixing/Mastering-Wissen)
 
-Dieser Kern liefert die **generische Steuer-Mechanik + Cubase-Standards + eine Demo-Plugin-Map**. Das optionale **[yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium)**-Add-On ergänzt die **volle Belegung + Abdeckung + das Mixing/Mastering-Wissen**:
+Dieser Kern liefert die **generische Steuer-Mechanik + Cubase-Standards + eine Demo-Plugin-Map (1 Stock-Plugin/Kategorie)**. Das optionale **[yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium)**-Add-On ergänzt die **volle Belegung + Abdeckung + das Mixing/Mastering-Wissen**:
 
 - **Volle Command-Belegung:** alle ~1559 vormals nicht-zugewiesenen Cubase-Commands fertig per Hotkey/MIDI gemappt (statt nur der Standards)
-- **Volle Plugin-Abdeckung:** komplette gescannte Param-/CC-Map (alle Stock- + Drittanbieter-Plugins) statt nur 2 Demo-Plugins je Kategorie
+- **Volle Plugin-Abdeckung:** komplette gescannte Param-/CC-Map (alle Stock- + Drittanbieter-Plugins) statt nur 1 Demo-Plugin je Kategorie
 - Audio-Analyse (LUFS / Spektrum / True-Peak)
 - Mastering-Chain-Empfehlungen pro Genre × Plattform
 - EQ-/Masking-Advice pro Track-Rolle, `nicker_*`-Tools (~30)
 - FabFilter Pro-Q3 / Pro-C2 per MIDI-Learn setzen
 - Traktor-Deck-Observer, DAWproject-Writer
 
-Der Server erkennt das Add-On automatisch (`_premium_in_same_runtime()`). Ohne Add-On läuft er als Core-only — die `nicker_*`-Tools sind dann ausgeblendet.
+Der Server erkennt das Add-On automatisch (`_premium_in_same_runtime()`). Ohne Add-On läuft er als Free-Build: die Steuer-Tools (`nicker_send_midi_cc`, `nicker_set_plugin_param` mit Demo-CC-Map) bleiben aktiv, die `nicker_*`-Wissens-Tools (Audio/Mastering/EQ/Registry) sind ausgeblendet.
 
 ## Repo-Struktur
 
@@ -95,7 +95,7 @@ yoka-cubase-mcp/
 │   ├── osc/           ← OSC-Bridge
 │   ├── setup/         ← Cubase Port-Setup-Parser
 │   ├── audio/         ← Playback
-│   └── mcp/server.py  ← 33 Core-Tools (Premium-Hook für Add-On)
+│   └── mcp/server.py  ← 40 Core-Tools (Premium-Hook für Add-On)
 ├── docs/              ← Setup-Guides, Demo-Workflows, Keymap-Export
 ├── specs/             ← Mackie-Map, Architektur-Notizen
 └── tests/selftests/   ← Offline-Selftests + Live-Smoketests
@@ -148,7 +148,7 @@ Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze d
 |---|---|
 | Mackie-Listener + Parser + State-Mirror | ✅ produktiv |
 | Sender + Closed-Loop-Verifikation | ✅ produktiv |
-| MCP-Server (33 Core-Tools) | ✅ produktiv |
+| MCP-Server (40 Core-Tools) | ✅ produktiv |
 | AHK-Bridge-Mechanik (Standard-Commands + Macros) | ✅ produktiv |
 | Generische Command-/Plugin-Steuer-Mechanik (MIDI Remote) | ✅ live verifiziert (volle Belegungs-/Plugin-Maps = Premium) |
 | MIDI-Note-Recording (autonom) | ✅ end-to-end verifiziert |
