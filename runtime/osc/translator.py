@@ -169,7 +169,7 @@ class OSCTranslator:
             try:
                 from runtime.persona.plugin_control import apply_preset
             except ImportError:
-                return {"ok": False, "error": "plugin_apply_preset requires premium package (yoka-cubase-premium)"}
+                return {"ok": False, "error": "plugin_apply_preset benötigt runtime/persona/plugin_control (Modul in diesem Build nicht verfügbar)"}
             preset_id = extracted["preset_id"]
             bus = args[0] if args else None
             r = apply_preset(preset_id=preset_id, bus=bus, port=self.port, dry_run=False)
@@ -179,7 +179,7 @@ class OSCTranslator:
             try:
                 from runtime.persona.plugin_control import apply_preset
             except ImportError:
-                return {"ok": False, "error": "plugin_apply_preset requires premium package (yoka-cubase-premium)"}
+                return {"ok": False, "error": "plugin_apply_preset benötigt runtime/persona/plugin_control (Modul in diesem Build nicht verfügbar)"}
             preset_id = extracted["preset_id"]
             bus = args[0] if args else None
             r = apply_preset(preset_id=preset_id, bus=bus, port=self.port, dry_run=True)
@@ -205,7 +205,7 @@ class OSCTranslator:
             try:
                 from runtime.persona.plugin_control import apply_preset
             except ImportError:
-                return {"ok": False, "error": "plugin_apply_preset requires premium package (yoka-cubase-premium)"}
+                return {"ok": False, "error": "plugin_apply_preset benötigt runtime/persona/plugin_control (Modul in diesem Build nicht verfügbar)"}
             return apply_preset(
                 preset_id=extracted["preset_id"],
                 bus=args[0] if args else None,
@@ -217,7 +217,7 @@ class OSCTranslator:
             try:
                 from runtime.persona.plugin_control import apply_preset
             except ImportError:
-                return {"ok": False, "error": "plugin_apply_preset requires premium package (yoka-cubase-premium)"}
+                return {"ok": False, "error": "plugin_apply_preset benötigt runtime/persona/plugin_control (Modul in diesem Build nicht verfügbar)"}
             return apply_preset(
                 preset_id=extracted["preset_id"],
                 bus=args[0] if args else None,

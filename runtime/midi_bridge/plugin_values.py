@@ -20,7 +20,8 @@ from typing import Optional
 
 REPO = Path(__file__).resolve().parent.parent.parent
 CC_MAP_PATH = REPO / "runtime" / "midi_bridge" / "cubase_value_cc_map.json"
-# Free-Build: volle CC-Map fehlt -> Fallback auf die Demo (1 Stock-Plugin je Kategorie).
+# Volle CC-Map fehlt (entsteht per eigenem Plugin-Scan) -> Fallback auf die
+# mitgelieferte Demo (1 Stock-Plugin je Kategorie).
 DEMO_CC_MAP_PATH = REPO / "runtime" / "midi_bridge" / "cubase_value_cc_map_demo.json"
 
 _cache: Optional[dict] = None
@@ -28,15 +29,15 @@ _cache: Optional[dict] = None
 
 _MISSING_MSG = (
     "Keine CC-Map gefunden (weder cubase_value_cc_map.json noch ...demo.json). "
-    "make_demo_param_map.py bzw. generate_value_bindings.py laufen lassen, oder das "
-    "Premium-Add-On mit voller Plugin-Abdeckung installieren."
+    "generate_value_bindings.py laufen lassen bzw. die volle CC-Map per eigenem "
+    "Plugin-Scan erzeugen (parse_param_scan.py)."
 )
 
 
 def _load() -> dict:
-    """Laedt die CC-Map: volle (Premium/Werkstatt) bevorzugt, sonst die Demo
-    (Free-Build, 1 Stock-Plugin je Kategorie). Fehlt beides, gibt resolve() eine
-    klare Meldung statt zu crashen — das Tool bleibt im Free-Server lauffaehig."""
+    """Laedt die CC-Map: volle (eigener Scan) bevorzugt, sonst die mitgelieferte
+    Demo (1 Stock-Plugin je Kategorie). Fehlt beides, gibt resolve() eine klare
+    Meldung statt zu crashen — der Server bleibt lauffaehig."""
     global _cache
     if _cache is None:
         for path in (CC_MAP_PATH, DEMO_CC_MAP_PATH):

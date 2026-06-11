@@ -2,7 +2,7 @@
   "version": "1.0",
   "generated_at": "2026-06-10",
   "kind": "demo",
-  "rationale": "Free-Demo-Param-Map: genau 1 echtes Cubase-Stock-Plugin je Kategorie. Macht die Plugin-Steuerung im Free-Build nutzbar (abgespeckt). Die volle Plugin-Abdeckung (alle Stock-Plugins + Drittanbieter) entsteht beim Nutzer per eigenem Scan (ki_studio_param_scan.js + parse_param_scan.py) bzw. ist Premium-Inhalt.",
+  "rationale": "Demo-Param-Map: genau 1 echtes Cubase-Stock-Plugin je Kategorie zum Ausprobieren. Die volle Plugin-Abdeckung (alle Stock-Plugins + Drittanbieter) entsteht beim Nutzer per eigenem Scan (ki_studio_param_scan.js + parse_param_scan.py).",
   "addressing": "Steuerung via ki_studio_value_remote.js (generisch) + nicker_set_plugin_param. Channel=Insert-Slot+1, CC=param_index.",
   "categories": [
     "EQ",

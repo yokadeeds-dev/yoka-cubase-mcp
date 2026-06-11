@@ -1,8 +1,8 @@
 # Drehbuch — KI-Studio MCP Demo-Lauf (v4)
 
-> ⭐ **Free vs. Premium (Cut-Line 2026-06-10):** **Free = generische Mechanik + Standards.** Mackie-Steuerung, MIDI-Recording, die AHK-Bridge-Mechanik und die **generische** Plugin-Parameter-Steuerung (das plugin-agnostische `ki_studio_value_remote.js` + Generatoren + Scanner) sind im **Free-Core** (`yoka-cubase-mcp`) — dazu die **Cubase-Standard-Commands** (die 656 mit eigenem Hotkey, die Cubase ohnehin kennt) und eine **Demo-Plugin-Map mit 2 echten Stock-Plugins je Kategorie**. **Premium** (`yoka-cubase-premium`): die **volle Command-Belegung** (alle 1559 vormals nicht-zugewiesenen Commands per Hotkey/MIDI), die **volle Plugin-Abdeckung** (komplette gescannte Map) und das Mixing/Mastering-**Wissen** (`nicker_*`). Kurz: **Mechanik + Standards + Demo = Free · volle Belegung + volle Abdeckung + welcher Wert richtig ist = Premium.**
+> **Voller Funktionsumfang (AGPL-3.0, public):** Mackie-Steuerung, MIDI-Recording, AHK-Bridge, die **volle Command-Belegung** (alle ~1559 Commands per Hotkey/MIDI), die **Cubase-Standard-Commands** und die plugin-agnostische Plugin-Parameter-Steuerung (`makeValueBinding`, Generatoren, Scanner) sind alle dabei — dazu der gesamte Nicker-Mixing/Mastering-Layer (`nicker_*`). Mitgeliefert ist eine **Demo-Plugin-Map (1 echtes Stock-Plugin je Kategorie)**; deine **volle Plugin-Abdeckung** entsteht aus deinem eigenen Scan (jede Cubase-Installation hat ein anderes Arsenal).
 
-> **v5 (2026-06-09 / Cut korrigiert 2026-06-10):** Plugin-Value-Bindings live — die **Mechanik** macht jeden vom Host veröffentlichten VST-Parameter adressierbar (`makeValueBinding`, unabhängig von plugin-internem MIDI-Learn). Live verifiziert: KI bewegte StudioEQ „1 Gain". **Free liefert die generische Mechanik + 2 Demo-Stock-Plugins je Kategorie**; die **volle Plugin-Abdeckung** (alle gescannten Stock- und Drittanbieter-Plugins) ist **Premium**. Das Steuer-JS selbst ist plugin-agnostisch (0 Plugin-Namen) — es bleibt Free, weil reine Mechanik.
+> **v5 (2026-06-09):** Plugin-Value-Bindings live — die Mechanik macht jeden vom Host veröffentlichten VST-Parameter adressierbar (`makeValueBinding`, unabhängig von plugin-internem MIDI-Learn). Live verifiziert: KI bewegte StudioEQ „1 Gain". Das Steuer-JS ist plugin-agnostisch (0 Plugin-Namen).
 
 > **v4 (2026-06-07):** Macro-Layer aktiviert. Take 2 nutzt jetzt `macro_*`-Trigger statt Dialog-Navigation. Setup-Phase schrumpft von 30 s auf 1 s. Hotkey-Whitelist im AHK-Bridge auf 52 Actions erweitert.
 
@@ -141,7 +141,7 @@
 
 ---
 
-## Take 3 — Plugin-Parameter-Steuerung: generische Mechanik (FREE) + Demo
+## Take 3 — Plugin-Parameter-Steuerung: generische Mechanik + Demo
 
 **Die Mechanik ist voll dabei — die Plugin-Map ist user-spezifisch.** Über die Cubase MIDI Remote API (`makeValueBinding`) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das **Steuer-JS ist plugin-agnostisch** (generische Slot×Param→CC-Bindings, 0 Plugin-Namen). Mitgeliefert ist eine **Demo-CC-Map** (1 Stock-Plugin je Kategorie) zum Ausprobieren; deine **volle Plugin-Abdeckung** entsteht aus deinem eigenen Scan (jede Cubase-Installation hat ein anderes Arsenal):
 
