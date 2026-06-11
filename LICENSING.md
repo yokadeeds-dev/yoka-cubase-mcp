@@ -24,8 +24,8 @@ Wenn du den Code in ein **proprietäres oder kommerzielles Produkt** einbetten w
 erfüllen, benötigst du eine **kommerzielle Lizenz**. Sie hebt die AGPL-Verpflichtungen
 für dein Produkt auf — gegen eine Gebühr bzw. Vereinbarung.
 
-**Anfragen:** über ein [GitHub-Issue](https://github.com/yokadeeds-dev/yoka-cubase-mcp/issues)
-oder per E-Mail an `<TODO: Kontakt-E-Mail eintragen>`.
+**Anfragen:** per E-Mail an **yoka@provolution.org** oder über ein
+[GitHub-Issue](https://github.com/yokadeeds-dev/yoka-cubase-mcp/issues).
 
 ## Warum dual?
 
