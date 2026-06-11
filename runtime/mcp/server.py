@@ -53,21 +53,21 @@ from runtime.midi_bridge.send_cc import (
     send_notes as send_midi_notes,
     send_note_sequence as send_midi_note_sequence,
 )
-# ---------- Premium-Plugin-Hook ----------
-# Premium-Module (persona, traktor) sind optional. Wenn die Imports failen,
-# laeuft der Server im Public-Build-Modus: nur Core-Tools verfuegbar.
-# Public-Init kopiert Files OHNE runtime/persona/ + runtime/traktor/ → automatisch.
+# ---------- Optionale-Module-Hook ----------
+# Die Module persona (Nicker-Wissen) + traktor sind technisch optional: fehlen
+# sie, laeuft der Server graceful nur mit den Kern-Tools. Im normalen Build sind
+# sie vorhanden — voller Funktionsumfang, alle Tools aktiv (ADR 2026-06-11).
 #
-# Defensive: Premium-Module muessen im SELBEN runtime/-Verzeichnis liegen wie
-# dieses Modul. Sonst koennten sys.path-Leaks (Claude Code spawnt MCP-Server
-# manchmal mit cwd der Host-App, nicht der MCP-Config) Premium-Module aus
-# einem anderen Repo laden und damit die Public/Private-Trennung umgehen.
-def _premium_in_same_runtime() -> bool:
+# Defensive: die optionalen Module muessen im SELBEN runtime/-Verzeichnis liegen
+# wie dieses Modul. Sonst koennten sys.path-Leaks (Claude Code spawnt MCP-Server
+# manchmal mit cwd der Host-App, nicht der MCP-Config) Module aus einem anderen
+# Repo laden.
+def _optional_modules_in_same_runtime() -> bool:
     import os as _os
     _here = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))  # .../runtime/
     return _os.path.isdir(_os.path.join(_here, "persona")) and _os.path.isdir(_os.path.join(_here, "traktor"))
 
-if _premium_in_same_runtime():
+if _optional_modules_in_same_runtime():
     try:
         from runtime.persona.plugin_control import (
             apply_preset as plugin_apply_preset,
@@ -84,13 +84,13 @@ if _premium_in_same_runtime():
         from runtime.persona.cubase_plugin_sync import sync as cubase_plugin_sync_run
         from runtime.persona.reports import render_session_report
         from runtime.traktor.observer import snapshot as traktor_snapshot
-        PREMIUM_AVAILABLE = True
+        OPTIONAL_MODULES_AVAILABLE = True
     except ImportError:
-        PREMIUM_AVAILABLE = False
+        OPTIONAL_MODULES_AVAILABLE = False
 else:
-    PREMIUM_AVAILABLE = False
+    OPTIONAL_MODULES_AVAILABLE = False
 
-if not PREMIUM_AVAILABLE:
+if not OPTIONAL_MODULES_AVAILABLE:
     plugin_apply_preset = None  # type: ignore[assignment]
     plugin_list_presets = None  # type: ignore[assignment]
     plugin_set_pro_c2 = None  # type: ignore[assignment]
@@ -102,7 +102,7 @@ if not PREMIUM_AVAILABLE:
     cubase_plugin_sync_run = None  # type: ignore[assignment]
     render_session_report = None  # type: ignore[assignment]
     traktor_snapshot = None  # type: ignore[assignment]
-    PREMIUM_AVAILABLE = False
+    OPTIONAL_MODULES_AVAILABLE = False
 
 
 # ---------- DAW-Registry (Multi-DAW) ----------
@@ -129,8 +129,8 @@ DAW_REGISTRY: dict[str, dict[str, str]] = {
     },
 }
 
-# Traktor-Entry nur registrieren wenn Premium-Module verfuegbar (Traktor-Observer ist Premium)
-if PREMIUM_AVAILABLE:
+# Traktor-Entry nur registrieren wenn das optionale traktor-Modul verfuegbar ist
+if OPTIONAL_MODULES_AVAILABLE:
     DAW_REGISTRY["traktor"] = {
         "listener_port": os.environ.get("MACKIE_LISTENER_PORT_TRAKTOR", "MACKIE_FROM_CUBASE"),
         "sender_port": os.environ.get("MACKIE_SENDER_PORT_TRAKTOR", "MACKIE_TO_CUBASE"),
@@ -1461,17 +1461,17 @@ _ALL_TOOLS: list[Tool] = [
 ]
 
 
-# ---------- Premium-Tool-Filter (aufgeloest 2026-06-11) ----------
-# Premium-Modell aufgegeben: voller Funktionsumfang ist jetzt oeffentlich (AGPL-3.0
-# + kommerzielle Lizenz), Sponsoring ist freiwillige Unterstuetzung statt Zugangs-Gate.
-# Alle Tools sind Kern. Diese Liste bleibt leer; der Filter unten ist damit ein No-op
-# (als Mechanik fuer eventuelle kuenftige Gating-Faelle erhalten).
+# ---------- Tool-Gating (optional) ----------
+# Voller Funktionsumfang ist oeffentlich (AGPL-3.0 + kommerzielle Lizenz), kein
+# Premium-Gate mehr (ADR 2026-06-11). Diese Liste ist leer -> alle Tools sind aktiv.
+# Der Filter bleibt als Mechanik erhalten, falls je Tools optionale Module brauchen,
+# die fehlen koennen (dann hier listen).
 
-_PREMIUM_TOOL_NAMES: set[str] = set()
+_GATED_TOOL_NAMES: set[str] = set()
 
 TOOLS: list[Tool] = [
     t for t in _ALL_TOOLS
-    if PREMIUM_AVAILABLE or t.name not in _PREMIUM_TOOL_NAMES
+    if OPTIONAL_MODULES_AVAILABLE or t.name not in _GATED_TOOL_NAMES
 ]
 
 
@@ -1490,16 +1490,15 @@ async def call_tool(name: str, arguments: dict[str, Any] | None) -> list[TextCon
     args = arguments or {}
     daw = _get_daw_arg(args)
 
-    # ---- Premium-Guard ----
-    # Wenn Premium-Tool aufgerufen, aber Premium nicht installiert: frueh raus.
-    # Normalerweise sollte die MCP-Tool-Liste schon gefiltert sein (s.o. TOOLS),
-    # aber falls ein Client raten sollte, geben wir eine klare Fehlermeldung.
-    if not PREMIUM_AVAILABLE and name in _PREMIUM_TOOL_NAMES:
+    # ---- Optional-Module-Guard ----
+    # Falls ein gegatetes Tool aufgerufen wird, dessen optionale Module fehlen:
+    # frueh raus mit klarer Meldung. Liste aktuell leer -> Guard ist ein No-op.
+    if not OPTIONAL_MODULES_AVAILABLE and name in _GATED_TOOL_NAMES:
         return _error_envelope(
             tool=name, daw=daw,
             message=(
-                f"Tool '{name}' requires the premium package "
-                f"(yoka-cubase-premium). This is the public/free build."
+                f"Tool '{name}' braucht ein optionales Modul (runtime/persona "
+                f"oder runtime/traktor), das in diesem Build fehlt."
             ),
         )
 
