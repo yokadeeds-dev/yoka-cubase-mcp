@@ -30,9 +30,9 @@ für dein Produkt auf — gegen eine Gebühr bzw. Vereinbarung.
 ## Warum dual?
 
 So bleibt das Tool für die Community frei und offen — während kommerzielle Anbieter,
-die es schließen oder weiterverkaufen wollen, einen fairen Beitrag leisten. Der
-Premium-Wissens-Layer (Mixing/Mastering, `yoka-cubase-premium`) ist davon getrennt
-und separat (privat) lizenziert.
+die es schließen oder weiterverkaufen wollen, einen fairen Beitrag leisten. Der volle
+Funktionsumfang inkl. Mixing-/Mastering-Wissen (Nicker) ist Teil dieses Repos — es gibt
+kein separates Premium-Paket.
 
 ## Beiträge
 

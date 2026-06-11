@@ -1,6 +1,6 @@
 # Cubase-Macros für KI-Demo-Choreografien
 
-> ⭐ **Free vs. Premium:** Die Macros selbst (Setup, Transport, A/B-Snapshots) sind Free-Core. Schritte, die Mixing/Mastering-**Wissen** (`nicker_*`) nutzen, gehören zum **Premium-Add-On** [yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium). Plugin-Parameter-*Steuerung* (auch Stock-VST) ist Free.
+> Die Macros (Setup, Transport, A/B-Snapshots), die Plugin-Parameter-Steuerung und die Nicker-Wissens-Schritte (`nicker_*`) sind **alle im vollen Funktionsumfang dabei** (AGPL-3.0). Deine volle Plugin-Abdeckung scannst du selbst (s. README → *User-spezifische Daten*).
 
 **Position im Stack:**
 - **Atomic-Layer:** Cubase-Defaults + KI-Hotkey-Cluster (35 Actions, siehe `drehbuch_hotkey_layout.md`)

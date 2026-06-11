@@ -1461,43 +1461,13 @@ _ALL_TOOLS: list[Tool] = [
 ]
 
 
-# ---------- Premium-Tool-Filter ----------
-# Wenn PREMIUM_AVAILABLE=False (Public-Build), werden Premium-Tools aus der
-# nach aussen exponierten TOOLS-Liste gefiltert. Die Definitionen bleiben in
-# _ALL_TOOLS, werden aber nicht registriert.
+# ---------- Premium-Tool-Filter (aufgeloest 2026-06-11) ----------
+# Premium-Modell aufgegeben: voller Funktionsumfang ist jetzt oeffentlich (AGPL-3.0
+# + kommerzielle Lizenz), Sponsoring ist freiwillige Unterstuetzung statt Zugangs-Gate.
+# Alle Tools sind Kern. Diese Liste bleibt leer; der Filter unten ist damit ein No-op
+# (als Mechanik fuer eventuelle kuenftige Gating-Faelle erhalten).
 
-_PREMIUM_TOOL_NAMES: set[str] = {
-    "nicker_list_mastering_genres",
-    "nicker_list_mastering_platforms",
-    "nicker_suggest_mastering_chain",
-    "nicker_list_studium_docs",
-    "nicker_search_studium",
-    "nicker_get_studium_doc",
-    "nicker_analyze_audio_file",
-    "nicker_audit_audio_file",
-    "nicker_suggest_track_settings",
-    "nicker_list_track_roles",
-    "nicker_compare_audio_files",
-    "nicker_log_reaction",
-    "nicker_reaction_summary",
-    "nicker_list_reaction_tags",
-    "nicker_freq_advice",
-    "nicker_list_freq_track_roles",
-    "nicker_find_masking_conflicts",
-    # Generische Steuer-Mechanik = Free (abgespeckt: Plugin-Steuerung greift via
-    # plugin_values.py auf die Demo-CC-Map zurueck, 1 Stock-Plugin je Kategorie):
-    #   nicker_send_midi_cc(_pct/_range), nicker_set_plugin_param, nicker_list_midi_ports
-    #   -> bewusst NICHT in dieser Premium-Liste.
-    "nicker_set_pro_q3_band",
-    "nicker_set_pro_c2",
-    "nicker_apply_preset",
-    "nicker_list_mix_presets",
-    "nicker_lookup_plugin",
-    "nicker_get_plugin_details",
-    "nicker_plugin_registry_stats",
-    "nicker_sync_plugins_from_cubase",
-    "get_traktor_state",
-}
+_PREMIUM_TOOL_NAMES: set[str] = set()
 
 TOOLS: list[Tool] = [
     t for t in _ALL_TOOLS

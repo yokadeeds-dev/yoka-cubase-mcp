@@ -1,0 +1,554 @@
+{
+    "$schema_version": "1.0",
+    "description": "Kurations-Layer für Plugin-Registry. Joined mit yoka_plugins.json (Cubase-Report) über das Feld 'name' (exact match). Enthält KI-relevante Anreicherung: Sound-Tags, Use-Cases, CC-Mapping-Refs, Lizenz-Status. Inkrementell erweiterbar — neue Plugins können jederzeit hinzugefügt werden, ohne yoka_plugins.json zu touchen.",
+    "stand": "2026-05-21",
+    "source_inspiration": "specs/yoka_plugin_inventory.md + specs/recommended_bus_chains_2026_05_13.md + Cubase-Report",
+    "convention": {
+        "name": "MUST exact-match mit yoka_plugins.json['plugins'][N]['name']",
+        "tags": "freier String-Array, deskriptiv (warm, transparent, vintage, surgical, lo-fi, harsh, character, clean, etc.)",
+        "use_cases": "freier String-Array, snake_case (corrective_eq, vocal_compression, bass_glue, master_limiter, etc.)",
+        "license_status": "active | demo_expired | free | perpetual | subscription | unknown",
+        "cc_mapping": "Key in midi_channel_layout.json/channels/{ch}/plugins/{key} — oder null wenn nicht KI-steuerbar",
+        "ki_role": "primary | secondary | utility — wie zentral fuer Nicker-Empfehlungen"
+    },
+    "plugins": [
+        {
+            "name": "FabFilter Pro-Q 3",
+            "tags": ["transparent", "clean", "surgical", "industry_standard"],
+            "use_cases": ["corrective_eq", "mastering_eq", "vocal_eq", "broadcast_eq", "mid_side_eq", "dynamic_eq"],
+            "license_status": "active",
+            "cc_mapping": "fabfilter_pro_q3",
+            "ki_role": "primary",
+            "notes": "Industriestandard für alle EQ-Aufgaben. KI-steuerbar via CC20-43 (3 Bänder)."
+        },
+        {
+            "name": "FabFilter Pro-C 2",
+            "tags": ["transparent", "versatile", "modern", "industry_standard"],
+            "use_cases": ["vocal_compression", "bass_glue", "drum_glue", "bus_compression", "parallel_compression", "sidechain_compression"],
+            "license_status": "active",
+            "cc_mapping": "fabfilter_pro_c2",
+            "ki_role": "primary",
+            "notes": "Industriestandard-Compressor. KI-steuerbar via CC48-57. 8 Style-Modi (Clean, Classic, Opto, Vocal, Mastering, Bus, Punch, Pumping)."
+        },
+        {
+            "name": "FabFilter Pro-L 2",
+            "tags": ["transparent", "clean", "brick_wall"],
+            "use_cases": ["master_limiter", "streaming_master", "true_peak_limiting"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Brick-Wall-Limiter für Mastering. ITU True-Peak-konform."
+        },
+        {
+            "name": "FabFilter Pro-R",
+            "tags": ["transparent", "clean", "modern", "controllable"],
+            "use_cases": ["mastering_reverb", "vocal_reverb", "drum_reverb", "room_reverb"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Algorithmic Reverb, sehr clean, gute Decay-Kontrolle pro Frequenzband."
+        },
+        {
+            "name": "FabFilter Pro-DS",
+            "tags": ["transparent", "surgical", "clean"],
+            "use_cases": ["vocal_de_essing", "sibilance_control", "harshness_reduction"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "De-Esser für Vocal-Chain. Allpass-basiert, sehr unauffällig."
+        },
+        {
+            "name": "FabFilter Pro-G",
+            "tags": ["transparent", "surgical", "clean"],
+            "use_cases": ["gating", "noise_floor", "drum_cleanup", "expander"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Gate/Expander mit transparenter Übertragung."
+        },
+        {
+            "name": "FabFilter Saturn 2",
+            "tags": ["warm", "character", "harmonic", "multiband"],
+            "use_cases": ["tape_saturation", "tube_warmth", "bass_character", "drum_glue_alternative", "creative_distortion"],
+            "license_status": "active",
+            "cc_mapping": "fabfilter_saturn2",
+            "ki_role": "primary",
+            "notes": "Multiband-Saturation. KI-steuerbar via CC60-79. Vielseitig: Tape/Tube/Magnetic/Drive/Lo-Fi."
+        },
+        {
+            "name": "FabFilter Pro-MB",
+            "tags": ["transparent", "surgical", "multiband"],
+            "use_cases": ["multiband_compression", "bass_control", "vocal_control", "mastering_dynamics"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Multiband-Compressor — für gezielte Frequenz-Bereichs-Dynamik."
+        },
+        {
+            "name": "FabFilter Timeless 3",
+            "tags": ["modern", "controllable", "creative"],
+            "use_cases": ["delay", "tape_delay_simulation", "rhythmic_echo", "vocal_delay"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Delay/Reverb-Hybrid mit Tape-Charakter und Modulation."
+        },
+        {
+            "name": "FabFilter Volcano 3",
+            "tags": ["analog", "warm", "character"],
+            "use_cases": ["filter_modulation", "creative_filtering", "synth_movement"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Analog-Modelled Multimode-Filter mit Modulation."
+        },
+        {
+            "name": "FabFilter Simplon",
+            "tags": ["simple", "analog"],
+            "use_cases": ["highpass_filtering", "lowpass_filtering", "minimalist_filter"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "Simpler HP/LP-Filter — schlanke FabFilter-Alternative."
+        },
+        {
+            "name": "Ozone 12",
+            "tags": ["mastering_suite", "comprehensive", "modern"],
+            "use_cases": ["mastering_chain", "master_assistant", "spectrum_balancing"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Komplette Mastering-Suite mit AI-Assistant. 17 Module verfügbar."
+        },
+        {
+            "name": "Ozone 12 Imager",
+            "tags": ["spatial", "stereo_field", "mid_side"],
+            "use_cases": ["bass_mono_lock", "stereo_widening", "mid_side_control", "mono_compatibility"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "KRITISCH für Bass-Mono-Lock unter 150 Hz bei Master-Bus."
+        },
+        {
+            "name": "Ozone 12 Vintage Compressor",
+            "tags": ["vintage", "character", "smooth"],
+            "use_cases": ["bus_glue", "vintage_compression"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Vintage-Style-Comp für analoge Wärme."
+        },
+        {
+            "name": "Ozone 12 Vintage Tape",
+            "tags": ["vintage", "tape", "warm", "character"],
+            "use_cases": ["tape_saturation", "mastering_glue"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Tape-Emulation für Master-Bus oder einzelne Spuren."
+        },
+        {
+            "name": "Ozone 12 Master Rebalance",
+            "tags": ["ai", "stem_separation"],
+            "use_cases": ["post_mix_adjustment", "vocal_balance_in_master"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "AI-basierte Stem-Anpassung am fertigen Master — Drums lauter etc. ohne Spurzugriff."
+        },
+        {
+            "name": "BASSROOM",
+            "tags": ["bass_specialist", "reference_based"],
+            "use_cases": ["bass_balance_check", "low_end_validation"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Validiert Bass-Balance gegen Genre-Referenz-Tracks."
+        },
+        {
+            "name": "MIXROOM",
+            "tags": ["reference_based", "calibration"],
+            "use_cases": ["mix_eq_calibration", "monitoring_correction"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Hörumgebungs-EQ-Profile + Mid-Side Multiband-EQ."
+        },
+        {
+            "name": "LIMITER",
+            "tags": ["transparent", "brick_wall"],
+            "use_cases": ["master_limiter", "alternative_to_pro_l2"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Mastering The Mix Limiter — Alternative zu FabFilter Pro-L 2."
+        },
+        {
+            "name": "LEVELS",
+            "tags": ["metering", "monitoring"],
+            "use_cases": ["live_lufs_metering", "true_peak_monitoring", "dynamic_range_check"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Live-Metering ohne Audio-Eingriff. Sehr informativ."
+        },
+        {
+            "name": "REFERENCE",
+            "tags": ["reference_based", "monitoring"],
+            "use_cases": ["a_b_compare", "reference_track_matching"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "A/B-Vergleich mit Referenz-Tracks (lautstärke-matched)."
+        },
+        {
+            "name": "FUSER",
+            "tags": ["mid_side", "stereo_field"],
+            "use_cases": ["mid_side_eq", "bass_mono_below_x", "width_control"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Mid/Side EQ — gute Alternative zu Pro-Q3 für M/S-Workflows."
+        },
+        {
+            "name": "RESO",
+            "tags": ["automatic", "resonance"],
+            "use_cases": ["resonance_cleanup", "automatic_eq_correction"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "Auto-Resonanz-Killer für problematische Mid-Hi-Bereiche."
+        },
+        {
+            "name": "ANIMATE",
+            "tags": ["movement", "modulation", "creative"],
+            "use_cases": ["movement_addition", "dynamic_movement", "stereo_animation"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Movement-/Dynamics-Modulator — für lebendigere FX-Spuren."
+        },
+        {
+            "name": "FASTERMASTER",
+            "tags": ["automatic", "mastering_ai"],
+            "use_cases": ["quick_master", "ai_mastering"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "AI-driven Quick-Mastering — kein händisches Tweaking."
+        },
+        {
+            "name": "Magneto II",
+            "tags": ["tape", "warm", "character", "vintage"],
+            "use_cases": ["tape_saturation", "drum_glue", "master_glue"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Cubase Stock Tape-Saturator. Gute Alternative zu Saturn 2."
+        },
+        {
+            "name": "REVerence",
+            "tags": ["convolution", "realistic"],
+            "use_cases": ["room_simulation", "convolution_reverb"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Cubase Stock Convolution-Reverb mit Impulse-Response-Library."
+        },
+        {
+            "name": "RoomWorks",
+            "tags": ["clean", "algorithmic"],
+            "use_cases": ["general_reverb", "send_reverb"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "Cubase Stock Algorithmic Reverb — solider Default."
+        },
+        {
+            "name": "Vocoder",
+            "tags": ["effect", "synth_vocal"],
+            "use_cases": ["vocoder_effect", "vocal_synth"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "Cubase Stock Vocoder."
+        },
+        {
+            "name": "Melodyne",
+            "tags": ["pitch_correction", "transient_processing"],
+            "use_cases": ["vocal_tuning", "note_editing", "polyphonic_tuning", "timing_correction"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "ARA-Integration in Cubase. Tonal Voice Algorithm für natural Vocals."
+        },
+        {
+            "name": "RePitch VST",
+            "tags": ["pitch_correction", "transparent"],
+            "use_cases": ["vocal_tuning_alternative_to_melodyne", "note_by_note_pitch"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Synchro Arts Pitch-Tool — Alternative zu Melodyne mit eigenem Algorithmus."
+        },
+        {
+            "name": "ValhallaVintageVerb",
+            "tags": ["vintage", "character", "plate", "hall"],
+            "use_cases": ["vocal_reverb", "vintage_reverb", "plate_reverb", "hall_reverb"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Valhalla VintageVerb — Industriestandard für Plate/Hall mit vintage-Charakter."
+        },
+        {
+            "name": "ValhallaRoom",
+            "tags": ["clean", "room", "natural"],
+            "use_cases": ["short_room", "drum_reverb", "natural_space"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Valhalla Room — sehr cleaner Room-Verb."
+        },
+        {
+            "name": "ValhallaShimmer",
+            "tags": ["ambient", "pitch_shifted", "ethereal"],
+            "use_cases": ["pad_reverb", "ambient_layer", "shimmer_effect"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Valhalla Shimmer — pitch-shifted ethereal reverb."
+        },
+        {
+            "name": "ValhallaPlate",
+            "tags": ["plate", "vintage"],
+            "use_cases": ["plate_reverb", "vocal_plate"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Valhalla Plate — dezicated Plate-Emulation."
+        },
+        {
+            "name": "ValhallaSupermassive",
+            "tags": ["ambient", "massive", "creative", "free"],
+            "use_cases": ["ambient_pad", "creative_effects", "huge_space"],
+            "license_status": "free",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Valhalla Supermassive — gratis, massive Delay/Reverb-Hybrid."
+        },
+        {
+            "name": "H910 Harmonizer",
+            "tags": ["vintage", "character", "classic"],
+            "use_cases": ["pitch_doubling", "vocal_thickening", "classic_eventide"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Eventide H910 — der Klassiker für vocal pitch-doubling."
+        },
+        {
+            "name": "H949 Harmonizer",
+            "tags": ["vintage", "character", "classic"],
+            "use_cases": ["harmonizer", "vintage_pitch"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Eventide H949 — Nachfolger des H910 mit erweiterten Features."
+        },
+        {
+            "name": "Blackhole",
+            "tags": ["ambient", "huge", "cinematic"],
+            "use_cases": ["cinematic_reverb", "drop_effect", "ambient_pad"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Eventide Blackhole — cinematic Reverb für Drops und atmospheric layers."
+        },
+        {
+            "name": "MangledVerb",
+            "tags": ["distorted", "character", "creative"],
+            "use_cases": ["creative_reverb", "fx_reverb"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Eventide MangledVerb — verzerrter Reverb für Sound-Design."
+        },
+        {
+            "name": "UltraReverb",
+            "tags": ["versatile", "character"],
+            "use_cases": ["general_reverb", "vocal_reverb"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Eventide UltraReverb — flexibler Reverb mit eigenem Charakter."
+        },
+        {
+            "name": "Quadravox",
+            "tags": ["harmonizer", "polyphonic"],
+            "use_cases": ["four_voice_harmonizer", "backing_harmonies"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Eventide Quadravox — 4-stimmiger Harmonizer."
+        },
+        {
+            "name": "Cryogen",
+            "tags": ["glitch", "creative", "granular", "sound_design"],
+            "use_cases": ["live_glitch", "stutter_alternative", "sound_design"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Glitchmachines Cryogen — Granular-Glitch, gut für live-Stutter mit MIDI-Trigger."
+        },
+        {
+            "name": "Comet",
+            "tags": ["granular", "creative", "delay"],
+            "use_cases": ["granular_delay", "ambient_layer", "sound_design"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Polyverse Comet — Granular Delay, eher schwebend als hartes Stutter."
+        },
+        {
+            "name": "INTENSITY 2",
+            "tags": ["loudness", "psychoacoustic"],
+            "use_cases": ["loudness_enhancement", "presence_boost"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Zynaptiq INTENSITY 2 — psychoakustischer Loudness-Enhancer ohne pure compression."
+        },
+        {
+            "name": "UNVEIL",
+            "tags": ["restoration", "dereverb"],
+            "use_cases": ["dereverb", "spatial_cleanup"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Zynaptiq UNVEIL — Alternative zu iZotope RX De-reverb."
+        },
+        {
+            "name": "Kontakt 8",
+            "tags": ["sampler", "comprehensive"],
+            "use_cases": ["sampling", "library_playback", "drum_sampling", "orchestral_playback"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Native Instruments Kontakt 8 — Industriestandard-Sampler."
+        },
+        {
+            "name": "Komplete Kontrol",
+            "tags": ["wrapper", "browser"],
+            "use_cases": ["preset_browsing", "ni_library_access"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "Native Instruments Komplete Kontrol — Wrapper/Browser für KK-Library."
+        },
+        {
+            "name": "Guitar Rig 7",
+            "tags": ["amp_sim", "guitar"],
+            "use_cases": ["guitar_amp", "bass_amp", "creative_fx"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "NI Guitar Rig 7 — Amp-Simulationen für DI-Material."
+        },
+        {
+            "name": "Maschine 2",
+            "tags": ["sampler", "groove"],
+            "use_cases": ["drum_machine", "sampling", "groove_creation"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Native Instruments Maschine 2 — Groove-Box-Sampler."
+        },
+        {
+            "name": "Massive X",
+            "tags": ["synth", "modern", "powerful", "wavetable"],
+            "use_cases": ["bass_synth", "lead_synth", "modern_sound_design"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "NI Massive X — Nachfolger des legendären Massive. Wavetable + Modular-Feel."
+        },
+        {
+            "name": "Omnisphere",
+            "tags": ["synth", "comprehensive", "atmospheric", "powerful"],
+            "use_cases": ["pads", "atmospheric_textures", "cinematic_sounds", "all_purpose_synth"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Spectrasonics Omnisphere — riesige Library. Industriestandard für Pads + Texturen."
+        },
+        {
+            "name": "DUNE 3",
+            "tags": ["synth", "versatile", "modern"],
+            "use_cases": ["bass_synth", "lead_synth", "pads", "pluck_sounds"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Synapse Audio DUNE 3 — sehr versatiler VA/Wavetable-Synth."
+        },
+        {
+            "name": "Pigments",
+            "tags": ["synth", "modern", "creative", "wavetable"],
+            "use_cases": ["modern_pads", "creative_sound_design", "lead_synth"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "Arturia Pigments — Multi-Engine Synth (Analog, Wavetable, Sample, Harmonic, Utility). Sehr creative für Layer-8-Vision."
+        },
+        {
+            "name": "Diva",
+            "tags": ["analog", "warm", "vintage", "synth"],
+            "use_cases": ["analog_pads", "vintage_synth", "warm_bass"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "primary",
+            "notes": "u-he Diva — emuliert mehrere Vintage-Analog-Synths (Minimoog, Juno, etc.)."
+        },
+        {
+            "name": "Vital",
+            "tags": ["synth", "wavetable", "modern", "free"],
+            "use_cases": ["bass_synth", "lead_synth", "modern_sound_design"],
+            "license_status": "free",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Vital — gratis Wavetable-Synth. Sehr modern und mächtig."
+        },
+        {
+            "name": "Kick 3",
+            "tags": ["kick_synth", "drum"],
+            "use_cases": ["kick_design", "electronic_kick"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Sonic Academy Kick 3 — dedizierter Kick-Synthesizer."
+        },
+        {
+            "name": "Superior Drummer 3",
+            "tags": ["drums", "acoustic", "realistic"],
+            "use_cases": ["acoustic_drums", "drum_replacement", "realistic_kit"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "secondary",
+            "notes": "Toontrack Superior Drummer 3 — premium acoustic-drum-sampler."
+        },
+        {
+            "name": "XO",
+            "tags": ["sampler", "drum", "ai_organization"],
+            "use_cases": ["drum_sample_organization", "kit_building"],
+            "license_status": "active",
+            "cc_mapping": null,
+            "ki_role": "utility",
+            "notes": "XLN Audio XO — AI-organisierte Drum-Sample-Library."
+        }
+    ],
+    "license_notes": {
+        "antares_vocal_suite": {
+            "status": "demo_expired",
+            "affected_plugins": ["Articulator", "Aspire", "Auto-Tune EFX+", "Auto-Tune Pro", "Choir", "Throat", "Vocal Compressor", "Vocal EQ", "Vocal De-Esser", "Vocal Reverb"],
+            "note": "Nicht nutzbar. Alternativen nutzen: Melodyne, RePitch, FabFilter Pro-DS, Pro-C 2."
+        }
+    }
+}

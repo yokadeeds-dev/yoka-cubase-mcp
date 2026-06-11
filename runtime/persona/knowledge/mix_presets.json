@@ -1,0 +1,231 @@
+{
+  "version": "0.1",
+  "last_updated": "2026-05-13",
+  "source_docs": [
+    "specs/mix_sessions/2026_05_06_the_new_era_stems.md",
+    "runtime/persona/knowledge/mastering_chains.json"
+  ],
+  "notes": "Mix-Presets fuer KI-gesteuerte Plugin-Anwendung. Jedes Preset definiert Werte fuer einen oder mehrere Plugins. KI laedt via apply_preset(preset_id) und sendet die CCs in einer Sequenz an den passenden Bus. Werte stammen aus Stem-Analyse-Daten (datenbasiert wo moeglich) und Trip-Hop-Genre-Defaults (wo Lehrbuch).",
+
+  "categories": {
+    "bass": "Bass-Bus-Presets (Mono-Gruppe, Sub-fokussiert)",
+    "drums": "Drums-Bus-Presets (Glue + Punch)",
+    "synth": "Synth-Bus-Presets",
+    "vocals": "Vocal-Bus-Presets (Lead)",
+    "backing_vocals": "Backing Vocals (oft Stereo-Spread, mono-bass kritisch)",
+    "percussions": "Percussions-Bus",
+    "other": "FX/Other-Bus",
+    "guitar": "Guitar-Bus (Akustik/Elektrisch)",
+    "master": "Master-Bus-Mastering"
+  },
+
+  "presets": {
+    "triphop_bass_default": {
+      "display_name": "Trip-Hop Bass Default",
+      "category": "bass",
+      "default_bus": "bass",
+      "description": "Standard Bass-Bus fuer Trip-Hop: Low Cut @ 30 Hz, Mud-Cut @ 250 Hz, Definition @ 800 Hz. Quelle: Stem-Analyse 2026-05-06.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 30, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 24, "enabled": true},
+            {"num": 2, "freq_hz": 250, "gain_db": -2, "q": 1.0, "shape": "Bell", "enabled": true},
+            {"num": 3, "freq_hz": 800, "gain_db": 1.5, "q": 1.0, "shape": "Bell", "enabled": true}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": -15,
+          "ratio": 3.0,
+          "attack_ms": 10,
+          "release_ms": 100,
+          "knee_db": 6,
+          "wet_gain_db": 0,
+          "dry_gain_db": -36
+        }
+      }
+    },
+
+    "triphop_drums_glue": {
+      "display_name": "Trip-Hop Drums Glue-Bus",
+      "category": "drums",
+      "default_bus": "drums",
+      "description": "Drums-Bus mit Subsonic-HP und Bus-Glue-Compression. Stem-Analyse: Drums LUFS -20.1, Peak -2.4 -> Fader-Korrektur -2 dB extern + Glue 1.5 ratio.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 30, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 12, "enabled": true},
+            {"num": 2, "freq_hz": 300, "gain_db": 0, "q": 1.0, "shape": "Bell", "enabled": false},
+            {"num": 3, "freq_hz": 3000, "gain_db": 0, "q": 1.0, "shape": "Bell", "enabled": false}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": -22,
+          "ratio": 1.5,
+          "attack_ms": 30,
+          "release_ms": 200,
+          "knee_db": 12,
+          "wet_gain_db": 1,
+          "dry_gain_db": -36
+        }
+      }
+    },
+
+    "triphop_synth_default": {
+      "display_name": "Trip-Hop Synth Default",
+      "category": "synth",
+      "default_bus": "synth",
+      "description": "Synth-Bus: HP 60 Hz, Mud-Cut 300 Hz, Air-Boost 10 kHz. Air-Boost weil Stem-Analyse zeigt Air-Band schwach (-78 dB).",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 60, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 12, "enabled": true},
+            {"num": 2, "freq_hz": 300, "gain_db": -1.5, "q": 1.2, "shape": "Bell", "enabled": true},
+            {"num": 3, "freq_hz": 10000, "gain_db": 1.5, "q": 0.7, "shape": "High Shelf", "enabled": true}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": -22,
+          "ratio": 2.0,
+          "attack_ms": 20,
+          "release_ms": 150,
+          "knee_db": 6,
+          "wet_gain_db": 0
+        }
+      }
+    },
+
+    "vocal_lead_classic": {
+      "display_name": "Vocal Lead Classic (Trip-Hop)",
+      "category": "vocals",
+      "default_bus": "vocals",
+      "description": "Klassische Vocal-Lead-Kette: HP 100 Hz, Mud-Cut 300 Hz, Praesenz-Boost 3 kHz, ggf. Air 10 kHz. RX/Melodyne vor diesem Bus.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 100, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 12, "enabled": true},
+            {"num": 2, "freq_hz": 300, "gain_db": -1, "q": 1.5, "shape": "Bell", "enabled": true},
+            {"num": 3, "freq_hz": 3000, "gain_db": 1, "q": 1.0, "shape": "Bell", "enabled": true}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": -18,
+          "ratio": 3.0,
+          "attack_ms": 5,
+          "release_ms": 80,
+          "knee_db": 6,
+          "wet_gain_db": 2
+        }
+      }
+    },
+
+    "backing_vocals_default": {
+      "display_name": "Backing Vocals (Phase-Spread bewusst)",
+      "category": "backing_vocals",
+      "default_bus": "backing_vocals",
+      "description": "Backing Vocals mit aggressivem HP (120 Hz). Achtung: bei Stem mit Phase-Spread Korrelation -0.25 muss Master-Bus einen Bass-Mono-Imager haben (<150 Hz Mono).",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 120, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 24, "enabled": true},
+            {"num": 2, "freq_hz": 500, "gain_db": 0, "q": 1.0, "shape": "Bell", "enabled": false},
+            {"num": 3, "freq_hz": 8000, "gain_db": 0, "q": 1.0, "shape": "Bell", "enabled": false}
+          ]
+        }
+      }
+    },
+
+    "percussions_default": {
+      "display_name": "Percussions Trip-Hop",
+      "category": "percussions",
+      "default_bus": "percussions",
+      "description": "Percussion-Bus: HP 80 Hz (nicht mit Bass kollidieren), Mid-Klarheit 3 kHz fuer Click-Sounds.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 80, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 12, "enabled": true},
+            {"num": 2, "freq_hz": 3000, "gain_db": 1, "q": 1.5, "shape": "Bell", "enabled": true}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": -27,
+          "ratio": 2.5,
+          "attack_ms": 5,
+          "release_ms": 100
+        }
+      }
+    },
+
+    "other_fx_default": {
+      "display_name": "Other / FX Bus Default",
+      "category": "other",
+      "default_bus": "other",
+      "description": "FX/Crash-Stem: nur HP, sonst durchsichtig. Stereo-Korrelation oft niedrig (Effekt), das ist gewollt.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 100, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 12, "enabled": true}
+          ]
+        }
+      }
+    },
+
+    "guitar_default": {
+      "display_name": "Guitar Bus Default",
+      "category": "guitar",
+      "default_bus": "guitar",
+      "description": "Guitar-Bus: HP 80 Hz, Bell-Cut bei 250 Hz wenn muddy.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 80, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 12, "enabled": true},
+            {"num": 2, "freq_hz": 250, "gain_db": 0, "q": 1.0, "shape": "Bell", "enabled": false}
+          ]
+        }
+      }
+    },
+
+    "master_bus_streaming": {
+      "display_name": "Master-Bus Streaming (Trip-Hop/Spotify -14 LUFS)",
+      "category": "master",
+      "default_bus": "master",
+      "description": "Mastering-Chain Master-Bus: subtile Korrekturen + Praesenz-Air. Limiter und Saturation kommen separat (noch nicht KI-steuerbar).",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "freq_hz": 30, "gain_db": 0, "q": 1.0, "shape": "Low Cut", "slope": 24, "enabled": true},
+            {"num": 2, "freq_hz": 250, "gain_db": -1, "q": 1.0, "shape": "Bell", "enabled": true},
+            {"num": 3, "freq_hz": 3000, "gain_db": 0.5, "q": 0.7, "shape": "Bell", "enabled": true}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": -8,
+          "ratio": 1.3,
+          "attack_ms": 50,
+          "release_ms": 250,
+          "knee_db": 12,
+          "wet_gain_db": 1
+        }
+      }
+    },
+
+    "bypass_all_bass": {
+      "display_name": "Bypass alles (Bass-Bus)",
+      "category": "bass",
+      "default_bus": "bass",
+      "description": "Schaltet alle Pro-Q3-Baender und Pro-C 2 aus (Ratio 1:1, Threshold ganz oben). Reset-Preset.",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "bands": [
+            {"num": 1, "enabled": false},
+            {"num": 2, "enabled": false},
+            {"num": 3, "enabled": false}
+          ]
+        },
+        "fabfilter_pro_c2": {
+          "threshold_db": 0,
+          "ratio": 1.0
+        }
+      }
+    }
+  }
+}

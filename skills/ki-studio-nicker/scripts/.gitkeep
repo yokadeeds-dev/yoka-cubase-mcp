@@ -1,0 +1,10 @@
+# Absichtlich leer
+
+Der Nicker-Skill braucht keine eigenen Skripte — die Tool-Logik lebt im MCP-Server
+`ki-studio-mackie` (siehe `runtime/mcp/server.py`).
+
+Dieser Ordner existiert nur, um die von Skywork-Skills/skywork-music-maker etablierte
+Skill-Folder-Konvention (SKILL.md + scripts/ + references/) konsistent abzubilden.
+
+Falls künftig Nicker-spezifische Helper-Skripte nötig werden (z.B. lokale Audio-Analyse
+ohne MCP-Roundtrip, oder YMP-Volltext-Indexer als Standalone), landen sie hier.

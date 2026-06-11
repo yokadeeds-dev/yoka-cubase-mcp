@@ -1,0 +1,420 @@
+{
+  "version": "0.1",
+  "last_updated": "2026-05-06",
+  "source_doc": "specs/sprint_d_recipes.md (TBD)",
+  "notes": "Sprint D — One-Shot-Workflows als strukturierte Pläne. Jedes Rezept ist eine geordnete Liste von MCP-Tool-Aufrufen mit Parametern. Der Recipe-Planner liefert nur den Plan (kein automatischer Eingriff in die DAW); Ausführung erfolgt explizit per Persona-Aufruf oder MCP-Tool-Dispatch.",
+
+  "categories": {
+    "session_init": {
+      "display_name": "Session-Initialization",
+      "description": "Workflows die zu Beginn einer Session immer/oft passieren. Sidechain-Setup, Default-Plugins laden, Track-Coloring, EQ-Defaults."
+    },
+    "routine_eq": {
+      "display_name": "Routine EQ-Setup",
+      "description": "Pro-Track-Default-EQ-Settings nach Track-Rolle (Hipass, Mud-Cut, Air-Boost). Liefert Parameter, kein verbindlicher Final-Mix."
+    },
+    "mix_template": {
+      "display_name": "Mix-Template",
+      "description": "Kombiniert mehrere Init-Schritte zu einem Genre-/Style-spezifischen Session-Setup."
+    },
+    "cleanup": {
+      "display_name": "Aufräumen",
+      "description": "Mute/Solo lösen, Pegel reset, Plugins bypassen — typische 'Reset'-Workflows."
+    },
+    "pre_processing": {
+      "display_name": "Pre-Processing / Restauration",
+      "description": "Audio-Reparatur und -Tuning vor dem eigentlichen Mix: iZotope RX, Melodyne. Reihenfolge kritisch — Restauration vor Tuning, Tuning vor Mix-EQ/Comp."
+    }
+  },
+
+  "recipes": {
+    "sidechain_kick_to_bass": {
+      "display_name": "Sidechain: Kick → Bass",
+      "category": "session_init",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Kick triggert Bass-Compressor — klassischer Pump-Effekt. Default Trip-Hop/House/Techno.",
+      "preconditions": [
+        "kick_track_exists",
+        "bass_track_exists",
+        "compressor_available_on_bass"
+      ],
+      "params_schema": {
+        "ratio": {"type": "float", "default": 4.0, "range": [1.5, 10.0], "unit": "ratio"},
+        "attack_ms": {"type": "float", "default": 1.0, "range": [0.1, 30.0], "unit": "ms"},
+        "release_ms": {"type": "float", "default": 100.0, "range": [10.0, 500.0], "unit": "ms"},
+        "threshold_db": {"type": "float", "default": -18.0, "range": [-40.0, 0.0], "unit": "dB"}
+      },
+      "steps": [
+        {"tool": "select_track", "args": {"track_role": "bass"}, "purpose": "Bass-Spur fokussieren"},
+        {"tool": "load_device_on_track", "args": {"device_query": "Compressor", "position": "post_eq"}, "purpose": "Compressor auf Bass laden"},
+        {"tool": "set_sidechain_routing", "args": {"source_track_role": "kick", "dest_plugin": "Compressor"}, "purpose": "Kick als Sidechain-Source routen"},
+        {"tool": "set_device_parameter", "args": {"param": "Ratio", "value_param_ref": "ratio"}, "purpose": "Compression-Ratio setzen"},
+        {"tool": "set_device_parameter", "args": {"param": "Attack", "value_param_ref": "attack_ms"}, "purpose": "Schneller Attack für Pump"},
+        {"tool": "set_device_parameter", "args": {"param": "Release", "value_param_ref": "release_ms"}, "purpose": "Release passend zum Tempo (~1/8 bis 1/4)"},
+        {"tool": "set_device_parameter", "args": {"param": "Threshold", "value_param_ref": "threshold_db"}, "purpose": "Threshold so dass nur Kick-Hits ducken"}
+      ],
+      "postcheck_hints": [
+        "Bass duckt hörbar bei jedem Kick-Hit",
+        "GR-Meter zeigt 3-6 dB Reduction bei Kick-Schlag"
+      ],
+      "yoka_notes": "Default-Werte sind Trip-Hop-Startpunkte. Bei schnelleren Genres (Techno 130bpm+) Release runter auf 60-80ms."
+    },
+
+    "sidechain_kick_to_pad": {
+      "display_name": "Sidechain: Kick → Pad/Synth",
+      "category": "session_init",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Pad-Pumping — sehr typisch für Trance, Progressive House, EDM. Pad atmet im Beat.",
+      "preconditions": [
+        "kick_track_exists",
+        "pad_track_exists",
+        "compressor_available_on_pad"
+      ],
+      "params_schema": {
+        "ratio": {"type": "float", "default": 8.0, "range": [4.0, 20.0], "unit": "ratio"},
+        "attack_ms": {"type": "float", "default": 0.3, "range": [0.1, 5.0], "unit": "ms"},
+        "release_ms": {"type": "float", "default": 250.0, "range": [80.0, 800.0], "unit": "ms"},
+        "threshold_db": {"type": "float", "default": -22.0, "range": [-40.0, 0.0], "unit": "dB"}
+      },
+      "steps": [
+        {"tool": "select_track", "args": {"track_role": "pad"}, "purpose": "Pad-Spur fokussieren"},
+        {"tool": "load_device_on_track", "args": {"device_query": "Compressor", "position": "post_eq"}, "purpose": "Compressor laden"},
+        {"tool": "set_sidechain_routing", "args": {"source_track_role": "kick", "dest_plugin": "Compressor"}, "purpose": "Kick als Trigger"},
+        {"tool": "set_device_parameter", "args": {"param": "Ratio", "value_param_ref": "ratio"}, "purpose": "Hoher Ratio für sichtbaren Pump"},
+        {"tool": "set_device_parameter", "args": {"param": "Attack", "value_param_ref": "attack_ms"}, "purpose": "Sehr schneller Attack"},
+        {"tool": "set_device_parameter", "args": {"param": "Release", "value_param_ref": "release_ms"}, "purpose": "Langer Release für 'breathing'"},
+        {"tool": "set_device_parameter", "args": {"param": "Threshold", "value_param_ref": "threshold_db"}, "purpose": "Tiefer Threshold für deutliches Ducking"}
+      ],
+      "postcheck_hints": [
+        "Pad pumpt deutlich im Beat",
+        "Release erzeugt sichtbares 'Atmen'"
+      ],
+      "yoka_notes": "Klassischer EDM-Sound. Ratio 8:1+ ist typisch hier, anders als Kick→Bass."
+    },
+
+    "load_kick_kick3": {
+      "display_name": "Kick: KICK 3 (Sonic Academy) laden — Yokas Default",
+      "category": "session_init",
+      "daw_compat": ["ableton", "cubase"],
+      "description": "Yokas Standard-Kick-Workflow: neue MIDI-Spur 'Kick', KICK 3 VST laden. Kein vorgegebenes Preset — Patch-Auswahl bleibt bei Yoka.",
+      "preconditions": [],
+      "params_schema": {
+        "vst_query": {"type": "string", "default": "KICK 3", "unit": "browser_query"},
+        "track_color": {"type": "string", "default": "red", "unit": "color"}
+      },
+      "steps": [
+        {"tool": "create_midi_track", "args": {"name": "Kick"}, "purpose": "MIDI-Spur anlegen", "daw": "ableton"},
+        {"tool": "search_vst", "args": {"query_param_ref": "vst_query"}, "purpose": "KICK 3 im VST-Browser suchen"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query_param_ref": "vst_query"}, "purpose": "KICK 3 auf die Spur laden"},
+        {"tool": "set_track_color", "args": {"color": "red"}, "purpose": "Farbe rot für Drums"}
+      ],
+      "postcheck_hints": [
+        "Track 'Kick' existiert mit KICK 3",
+        "Plugin-GUI öffnet sich auf Default-State"
+      ],
+      "yoka_notes": "Yokas Standard-Kick-VST. Preset-Wahl manuell — KICK 3 hat eigene Library. Cubase: KICK 3 als Instrument-Track, Ableton: auf MIDI-Spur."
+    },
+
+    "load_bass_layered_wip": {
+      "display_name": "Bass-Layering Setup (WIP — Yoka-Workflow noch nicht final)",
+      "category": "session_init",
+      "daw_compat": ["ableton", "cubase"],
+      "description": "Bass-Layering-Skelett: 2-3 MIDI-Spuren für Sub-Layer / Mid-Layer / Definition-Layer. Recipe legt nur das Grundgerüst — die optimale Layer-Strategie ist Yoka-WIP.",
+      "preconditions": [],
+      "params_schema": {
+        "sub_layer_synth": {"type": "string", "default": "Operator", "unit": "browser_query"},
+        "mid_layer_synth": {"type": "string", "default": "Massive", "unit": "browser_query"},
+        "definition_layer_synth": {"type": "string", "default": "Bazille", "unit": "browser_query"},
+        "include_definition_layer": {"type": "boolean", "default": true, "unit": "flag"}
+      },
+      "steps": [
+        {"tool": "create_midi_track", "args": {"name": "Bass-Sub"}, "purpose": "Sub-Layer (reine Sinus / FM-Bass)", "daw": "ableton"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query_param_ref": "sub_layer_synth"}, "purpose": "Sub-Synth laden"},
+        {"tool": "set_track_color", "args": {"color": "orange"}, "purpose": "Farbe orange (Bass-Familie)"},
+        {"tool": "create_midi_track", "args": {"name": "Bass-Mid"}, "purpose": "Mid-Layer (Charakter, Fundament Mids)", "daw": "ableton"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query_param_ref": "mid_layer_synth"}, "purpose": "Mid-Synth laden"},
+        {"tool": "set_track_color", "args": {"color": "orange"}, "purpose": "Farbe orange"},
+        {"tool": "create_midi_track", "args": {"name": "Bass-Def", "if_param": "include_definition_layer"}, "purpose": "Definition-Layer (700-1500 Hz Click/Grit)", "daw": "ableton"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query_param_ref": "definition_layer_synth", "if_param": "include_definition_layer"}, "purpose": "Definition-Synth laden"},
+        {"tool": "group_tracks", "args": {"track_names": ["Bass-Sub", "Bass-Mid", "Bass-Def"], "group_name": "Bass-Group"}, "purpose": "In Gruppe zusammenfassen für Bus-Processing"}
+      ],
+      "postcheck_hints": [
+        "3 Bass-Spuren existieren in einer Gruppe",
+        "Jede Spur hat eigenen Synth — getrennt regelbar"
+      ],
+      "yoka_notes": "WIP: optimale Layer-Strategie noch nicht final. Sub-Layer typisch Sinus oder FM-Bass mono <120Hz. Mid-Layer Charakter (Reese/Saw). Definition-Layer hochpass-gefiltert ab 600Hz für Klick auf Speakern. Diskussion mit Yoka offen — Recipe bleibt Skelett."
+    },
+
+    "eq_init_session_hipass_all": {
+      "display_name": "EQ-Init: Hipass auf alles außer Kick/Sub",
+      "category": "session_init",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Initialer Mix-Cleanup: Hipass-Filter auf jeder Spur außer Kick und Sub-Bass. Frequenz nach Track-Rolle.",
+      "preconditions": [
+        "tracks_grouped_by_role"
+      ],
+      "params_schema": {
+        "default_hipass_hz": {"type": "float", "default": 80.0, "range": [40.0, 200.0], "unit": "Hz"}
+      },
+      "steps": [
+        {"tool": "freq_advisor_apply_hipass_per_role", "args": {"exclude_roles": ["kick", "808_sub", "bass"]}, "purpose": "Pro Track-Rolle den passenden HP-Cutoff setzen — Werte aus frequency_advice.json"}
+      ],
+      "postcheck_hints": [
+        "Sub-Bereich (<60 Hz) nur noch von Kick + Sub bestimmt",
+        "Mehr Headroom im Master"
+      ],
+      "yoka_notes": "Pflicht-Schritt vor jedem Mastering. Recipe nutzt freq_advisor-Werte als Quelle."
+    },
+
+    "eq_kick_default": {
+      "display_name": "EQ Kick: Default-Settings",
+      "category": "routine_eq",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Standard-Kick-EQ: HP @25Hz, leichter Cut @300-500Hz (Boxiness), leichter Boost @4-5kHz (Click).",
+      "preconditions": ["kick_track_selected"],
+      "params_schema": {
+        "hipass_hz": {"type": "float", "default": 25.0, "range": [20.0, 40.0], "unit": "Hz"},
+        "boxiness_cut_hz": {"type": "float", "default": 350.0, "range": [250.0, 500.0], "unit": "Hz"},
+        "boxiness_cut_db": {"type": "float", "default": -3.0, "range": [-6.0, 0.0], "unit": "dB"},
+        "click_boost_hz": {"type": "float", "default": 4500.0, "range": [3000.0, 6000.0], "unit": "Hz"},
+        "click_boost_db": {"type": "float", "default": 2.0, "range": [0.0, 4.0], "unit": "dB"}
+      },
+      "steps": [
+        {"tool": "load_device_on_track", "args": {"device_query": "EQ Eight", "position": "early"}, "purpose": "EQ-Plugin laden"},
+        {"tool": "set_eq_band", "args": {"band": 1, "type": "hipass", "freq_param_ref": "hipass_hz"}, "purpose": "Subsonic-HP"},
+        {"tool": "set_eq_band", "args": {"band": 2, "type": "bell", "freq_param_ref": "boxiness_cut_hz", "gain_param_ref": "boxiness_cut_db", "q": 1.5}, "purpose": "Boxiness wegnehmen"},
+        {"tool": "set_eq_band", "args": {"band": 3, "type": "bell", "freq_param_ref": "click_boost_hz", "gain_param_ref": "click_boost_db", "q": 1.0}, "purpose": "Click/Beater hervorheben"}
+      ],
+      "postcheck_hints": [
+        "Kick klingt definierter im Sub-Bereich",
+        "Mid-Boxiness reduziert",
+        "Click präsenter im Mix"
+      ],
+      "yoka_notes": "Werte gespiegelt aus frequency_advice.json. Nur Startpunkt — Final per Ohr."
+    },
+
+    "eq_bass_default": {
+      "display_name": "EQ Bass: Default-Settings",
+      "category": "routine_eq",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Bass-EQ: HP @40Hz (Sub-Reserve für Kick), Cut Mud @250Hz, Boost @700-900Hz für Definition, HighShelf -2dB @3kHz+.",
+      "preconditions": ["bass_track_selected"],
+      "params_schema": {
+        "hipass_hz": {"type": "float", "default": 40.0, "range": [30.0, 60.0], "unit": "Hz"},
+        "mud_cut_hz": {"type": "float", "default": 250.0, "range": [200.0, 350.0], "unit": "Hz"},
+        "mud_cut_db": {"type": "float", "default": -2.5, "range": [-5.0, 0.0], "unit": "dB"},
+        "definition_boost_hz": {"type": "float", "default": 800.0, "range": [600.0, 1000.0], "unit": "Hz"},
+        "definition_boost_db": {"type": "float", "default": 1.5, "range": [0.0, 3.0], "unit": "dB"}
+      },
+      "steps": [
+        {"tool": "load_device_on_track", "args": {"device_query": "EQ Eight", "position": "early"}, "purpose": "EQ laden"},
+        {"tool": "set_eq_band", "args": {"band": 1, "type": "hipass", "freq_param_ref": "hipass_hz"}, "purpose": "HP für Kick-Headroom"},
+        {"tool": "set_eq_band", "args": {"band": 2, "type": "bell", "freq_param_ref": "mud_cut_hz", "gain_param_ref": "mud_cut_db", "q": 1.2}, "purpose": "Mud entfernen"},
+        {"tool": "set_eq_band", "args": {"band": 3, "type": "bell", "freq_param_ref": "definition_boost_hz", "gain_param_ref": "definition_boost_db", "q": 1.0}, "purpose": "Definition hinzufügen"}
+      ],
+      "postcheck_hints": [
+        "Bass und Kick maskieren sich weniger",
+        "Bass ist auf Laptop-Speakern hörbar (Definition)"
+      ],
+      "yoka_notes": "Komplementär zum Kick-EQ. Bei Bass mit viel Sub den HP höher (50-60Hz)."
+    },
+
+    "eq_vocal_lead_default": {
+      "display_name": "EQ Vocal Lead: Default-Settings",
+      "category": "routine_eq",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Lead-Vocal: HP @100Hz, Cut Boxiness @300Hz, leichter Präsenz-Boost @3-4kHz, Air-Shelf +2dB @10kHz+.",
+      "preconditions": ["vocal_track_selected"],
+      "params_schema": {
+        "hipass_hz": {"type": "float", "default": 100.0, "range": [80.0, 150.0], "unit": "Hz"},
+        "boxiness_cut_hz": {"type": "float", "default": 300.0, "range": [250.0, 400.0], "unit": "Hz"},
+        "boxiness_cut_db": {"type": "float", "default": -2.0, "range": [-4.0, 0.0], "unit": "dB"},
+        "presence_boost_hz": {"type": "float", "default": 3500.0, "range": [2500.0, 5000.0], "unit": "Hz"},
+        "presence_boost_db": {"type": "float", "default": 2.0, "range": [0.0, 3.5], "unit": "dB"},
+        "air_shelf_hz": {"type": "float", "default": 10000.0, "range": [8000.0, 14000.0], "unit": "Hz"},
+        "air_shelf_db": {"type": "float", "default": 2.0, "range": [0.0, 4.0], "unit": "dB"}
+      },
+      "steps": [
+        {"tool": "load_device_on_track", "args": {"device_query": "EQ Eight", "position": "early"}, "purpose": "EQ laden"},
+        {"tool": "set_eq_band", "args": {"band": 1, "type": "hipass", "freq_param_ref": "hipass_hz"}, "purpose": "HP gegen Pop/Rumble"},
+        {"tool": "set_eq_band", "args": {"band": 2, "type": "bell", "freq_param_ref": "boxiness_cut_hz", "gain_param_ref": "boxiness_cut_db", "q": 1.5}, "purpose": "Boxiness raus"},
+        {"tool": "set_eq_band", "args": {"band": 3, "type": "bell", "freq_param_ref": "presence_boost_hz", "gain_param_ref": "presence_boost_db", "q": 1.0}, "purpose": "Forward / Präsenz"},
+        {"tool": "set_eq_band", "args": {"band": 4, "type": "highshelf", "freq_param_ref": "air_shelf_hz", "gain_param_ref": "air_shelf_db"}, "purpose": "Air / Luft"}
+      ],
+      "postcheck_hints": [
+        "Vocal sitzt vor dem Mix ohne aufdringlich zu sein",
+        "Sibilanz nicht verstärkt (separater De-Esser nötig)"
+      ],
+      "yoka_notes": "Vor diesem EQ ggf. Restoration (RX) und Tuning (Melodyne). Sibilanz separat per De-Esser, nicht hier."
+    },
+
+    "color_tracks_by_role": {
+      "display_name": "Tracks nach Rolle einfärben",
+      "category": "session_init",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Standard-Color-Coding: Drums rot, Bass orange, Vocal grün, Synth blau, FX violett, Master schwarz.",
+      "preconditions": ["tracks_named_or_typed"],
+      "params_schema": {},
+      "steps": [
+        {"tool": "color_all_tracks_by_role", "args": {"mapping": {"kick": "red", "snare": "red", "bass": "orange", "808_sub": "orange", "vocal_lead": "green", "vocal_backing": "light_green", "synth": "blue", "pad": "light_blue", "fx": "violet", "master_bus": "black"}}, "purpose": "Role-basiertes Color-Coding"}
+      ],
+      "postcheck_hints": [
+        "Visuelle Mix-Übersicht klar nach Funktionsgruppen"
+      ],
+      "yoka_notes": "Spart Augen-Suche. In Ableton via color_all_tracks_by_spectrum bereits machbar — diese Variante ist role-basiert statt frequenz-basiert."
+    },
+
+    "pre_process_vocal_rx_chain": {
+      "display_name": "Vocal Pre-Processing: iZotope RX VST3 Chain",
+      "category": "pre_processing",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Vor Mix/Tuning: RX VST3-Module in fixer Reihenfolge auf der Vocal-Spur. Mouth De-Click -> De-Plosive -> Voice De-Noise -> De-Ess. Reihenfolge ist kritisch: erst Punkt-Artefakte (Klicks/Plosive), dann breitbandiges Rauschen, dann Sibilanz.",
+      "preconditions": ["vocal_track_selected", "izotope_rx_installed"],
+      "params_schema": {
+        "use_mouth_declick": {"type": "boolean", "default": true, "unit": "flag"},
+        "use_deplosive": {"type": "boolean", "default": true, "unit": "flag"},
+        "use_voice_denoise": {"type": "boolean", "default": true, "unit": "flag"},
+        "use_de_ess": {"type": "boolean", "default": true, "unit": "flag"}
+      },
+      "steps": [
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 Mouth De-click", "if_param": "use_mouth_declick", "position": "early"}, "purpose": "Schmatzer/Mouth-Klicks entfernen"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 De-plosive", "if_param": "use_deplosive", "position": "early"}, "purpose": "P/B/T-Pops abschwaechen"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 Voice De-noise", "if_param": "use_voice_denoise", "position": "early"}, "purpose": "Hintergrundrauschen / Lueftungsgeraeusche"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 De-ess", "if_param": "use_de_ess", "position": "early"}, "purpose": "Sibilanz im Cleanup-Stadium (zusaetzlicher Mix-De-Esser kann spaeter folgen)"}
+      ],
+      "postcheck_hints": [
+        "Vocal klingt sauber, ohne Klicks/Pops",
+        "Background-Rauschen reduziert, ohne Vocal-Charakter zu verlieren",
+        "Sibilanz noch vorhanden aber nicht mehr aggressiv"
+      ],
+      "yoka_notes": "WICHTIG Reihenfolge: RX VST3 VOR Melodyne (sonst tunst du Artefakte mit), Melodyne VOR Mix-EQ/Comp. Tief-Spectral-Editing oder Dialogue-Isolate weiterhin in RX Standalone — dieses Recipe deckt 80% Routine-Restauration ab."
+    },
+
+    "pre_process_vocal_melodyne": {
+      "display_name": "Vocal Tuning: Melodyne 5 (ARA-Extension)",
+      "category": "pre_processing",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Vocal-Tuning mit Melodyne 5. Reihenfolge: NACH RX-Cleanup, VOR Mix-EQ/Comp. Cubase-Standard ist ARA-Integration (Audio > Extensions > Melodyne), nicht VST3-Insert.",
+      "preconditions": ["vocal_track_selected", "rx_cleanup_done", "melodyne_5_installed"],
+      "params_schema": {
+        "algorithm": {"type": "string", "default": "Tonal Voice", "unit": "algorithm"},
+        "key_root": {"type": "string", "default": "F", "unit": "note"},
+        "scale_type": {"type": "string", "default": "minor", "unit": "scale"},
+        "use_ara_integration": {"type": "boolean", "default": true, "unit": "flag"}
+      },
+      "steps": [
+        {"tool": "open_melodyne_extension", "args": {"if_param": "use_ara_integration"}, "purpose": "Cubase: Audio > Extensions > Melodyne (ARA) — zerstoerungsfrei, beste Integration"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "Melodyne 5", "position": "post_input", "if_not_param": "use_ara_integration"}, "purpose": "Fallback: Melodyne als VST3-Insert (ARA bevorzugt)"},
+        {"tool": "melodyne_set_algorithm", "args": {"algorithm_param_ref": "algorithm"}, "purpose": "Algorithmus 'Tonal Voice' fuer Vocals (in Melodyne 5 ersetzt 'Universal' fuer monophonen Gesang)"},
+        {"tool": "melodyne_transfer", "args": {}, "purpose": "Audio in Melodyne uebertragen (Pitch-Analyse)"},
+        {"tool": "melodyne_set_scale", "args": {"root_param_ref": "key_root", "type_param_ref": "scale_type"}, "purpose": "Tonart/Skala setzen — fuer dieses Projekt F-Moll"},
+        {"tool": "melodyne_correct_pitch_macro", "args": {"target_pct": 80, "drift_pct": 30}, "purpose": "Auto-Macro: Pitch-Center 80%, Pitch-Drift 30% — natuerlich klingender Default-Korrektur"}
+      ],
+      "postcheck_hints": [
+        "Tonart in Melodyne-Display: F minor",
+        "Notenfarben grün (in Skala) statt rot/gelb (off-key)",
+        "Vocal klingt tuned aber nicht roboterhaft"
+      ],
+      "yoka_notes": "Yoka-2012->2026-Update: (1) ARA statt VST3 nutzen — in Cubase 'Audio > Extensions > Melodyne'. Kein Re-Bouncen nötig, alles editierbar. (2) Algorithmus 'Tonal Voice' (frueher 'Universal') ist Standard fuer Sänger. (3) Macro 80% Center / 30% Drift = guter Default; Drift bewahrt Vibrato und natürliche Pitch-Bewegung. (4) Manuelle Note-by-Note-Korrektur immer noch möglich (Maus-Pitch-Tool wie 2012). (5) Polyphonic-Modus für Akkord-Material seit Melodyne 4 — nicht mehr nur monophon."
+    },
+
+    "pre_process_guitar_melodyne": {
+      "display_name": "Gitarre Tuning: Melodyne 5 (Polyphonic)",
+      "category": "pre_processing",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Gitarren-Tuning mit Melodyne 5 Polyphonic-Algorithm. Akkorde und Einzeltöne. ARA-Integration in Cubase. Verwendet wenn einzelne Saiten verstimmt sind.",
+      "preconditions": ["guitar_track_selected", "rx_cleanup_done", "melodyne_5_installed"],
+      "params_schema": {
+        "algorithm": {"type": "string", "default": "Polyphonic Sustain", "unit": "algorithm"},
+        "key_root": {"type": "string", "default": "F", "unit": "note"},
+        "scale_type": {"type": "string", "default": "minor", "unit": "scale"}
+      },
+      "steps": [
+        {"tool": "open_melodyne_extension", "args": {}, "purpose": "Cubase: Audio > Extensions > Melodyne (ARA)"},
+        {"tool": "melodyne_set_algorithm", "args": {"algorithm_param_ref": "algorithm"}, "purpose": "Polyphonic Sustain: erkennt Akkorde + einzelne Saiten"},
+        {"tool": "melodyne_transfer", "args": {}, "purpose": "Audio uebertragen — Polyphonic-Analyse dauert laenger als monophone"},
+        {"tool": "melodyne_set_scale", "args": {"root_param_ref": "key_root", "type_param_ref": "scale_type"}, "purpose": "F-Moll als Referenz-Skala"},
+        {"tool": "melodyne_review_chord_detection", "args": {}, "purpose": "MANUELLE Pruefung: hat Melodyne die Akkorde korrekt erkannt? Bei Fehler manuell korrigieren bevor Tuning angewendet wird"}
+      ],
+      "postcheck_hints": [
+        "Akkord-Display in Melodyne stimmt mit gespielten Akkorden ueberein",
+        "Einzelne Saiten als getrennte Noten erkannt (Polyphonic-Modus)",
+        "Off-Key-Saiten korrigiert ohne Akkord-Charakter zu zerstoeren"
+      ],
+      "yoka_notes": "Polyphonic-Erkennung kann fehlerhaft sein (z. B. bei dichtem Voicing oder Verzerrung). Daher Schritt 5 manuell — nicht blind tunen lassen. Bei E-Gitarre durch Verzerrer/Amp-Sim: lieber Trocken-Spur tunen (DI), dann durch Amp-Sim spielen. Bei Akustik-Gitarre: nur einzelne Probleme korrigieren, nicht ganze Spur — sonst klingt's leblos."
+    },
+
+    "pre_process_guitar_rx_chain": {
+      "display_name": "Gitarre Pre-Processing: iZotope RX VST3 Chain",
+      "category": "pre_processing",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Vor Mix/Tuning: RX VST3-Module auf Gitarren-Spur. De-Click -> De-Hum -> Spectral De-Noise. Pick-Klicks und Saiten-Squeaks zuerst, dann Brummen, dann breitbandiges Rauschen.",
+      "preconditions": ["guitar_track_selected", "izotope_rx_installed"],
+      "params_schema": {
+        "use_declick": {"type": "boolean", "default": true, "unit": "flag"},
+        "use_dehum": {"type": "boolean", "default": true, "unit": "flag"},
+        "use_spectral_denoise": {"type": "boolean", "default": true, "unit": "flag"},
+        "hum_freq_hz": {"type": "float", "default": 50.0, "range": [50.0, 60.0], "unit": "Hz"}
+      },
+      "steps": [
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 De-click", "if_param": "use_declick", "position": "early"}, "purpose": "Pick-Klicks und Saiten-Squeaks abschwaechen"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 De-hum", "if_param": "use_dehum", "position": "early"}, "purpose": "50/60 Hz Brummschleifen entfernen"},
+        {"tool": "set_device_parameter", "args": {"param": "Frequency", "value_param_ref": "hum_freq_hz"}, "purpose": "Hum-Grundfrequenz setzen (EU 50 Hz, US 60 Hz)"},
+        {"tool": "load_instrument_or_effect", "args": {"name_query": "RX 11 Spectral De-noise", "if_param": "use_spectral_denoise", "position": "early"}, "purpose": "Breitbandiges Background-Rauschen"}
+      ],
+      "postcheck_hints": [
+        "Gitarre frei von Brumm-Schleifen",
+        "Pick-Anschlaege weicher, Saiten-Squeaks reduziert",
+        "Background-Rauschen weg, Gitarrenklang erhalten"
+      ],
+      "yoka_notes": "Gilt fuer Akustik- wie E-Gitarre. Bei Akustik mit Mikro-Setup: Spectral De-Noise zuerst Profile lernen lassen (in RX Standalone); VST3-Variante nutzt Auto-Mode. Wenn Gitarre durch Verstaerker/Amp-Sim laeuft, ggf. nur De-Click + De-Hum noetig — Amp-Sim addiert oft eigenes Charakter-Rauschen das bewusst bleibt."
+    },
+
+    "auto_bounce_song_via_export_part": {
+      "display_name": "Auto-Bounce Song via Export-Part-Marker (Cubase + AHK)",
+      "category": "session_init",
+      "daw_compat": ["cubase"],
+      "description": "Yoka-Workflow: Pro Projekt existiert ein 'Export-Part' auf einer dedizierten leeren Spur, exakt so lang wie der Song. Recipe markiert ihn, aktiviert Loop, ruft Audio-Mixdown auf. Ziel: One-Shot-Bounce ohne manuelles Range-Setzen, fuer Remote-Bouncing wenn Yoka unterwegs ist.",
+      "preconditions": [
+        "cubase_open",
+        "project_loaded",
+        "export_part_exists_on_dedicated_track",
+        "mixdown_folder_in_project_settings",
+        "auto_filename_uses_project_name"
+      ],
+      "params_schema": {
+        "export_part_track_name": {"type": "string", "default": "EXPORT", "unit": "track_name"},
+        "loop_hotkey": {"type": "string", "default": "P", "unit": "key"},
+        "mixdown_hotkey": {"type": "string", "default": "ctrl+shift+left+alt+s", "unit": "chord"}
+      },
+      "steps": [
+        {"tool": "select_track", "args": {"track_name_param_ref": "export_part_track_name"}, "purpose": "Auf Export-Part-Spur wechseln"},
+        {"tool": "ahk_send_action", "args": {"action": "select_part_under_cursor"}, "purpose": "Export-Part markieren (per Maus oder via Selection-Tool)"},
+        {"tool": "ahk_send_action", "args": {"action": "trigger_key", "key_param_ref": "loop_hotkey"}, "purpose": "P drueckt -> Loop ueber markiertem Part aktiv"},
+        {"tool": "ahk_send_action", "args": {"action": "trigger_chord", "chord_param_ref": "mixdown_hotkey"}, "purpose": "Custom-Hotkey oeffnet Audio-Mixdown-Dialog (Yoka-spezifisch, frueher Photoshop 'fuer Web speichern')"},
+        {"tool": "ahk_send_action", "args": {"action": "click_button", "label": "Audio exportieren"}, "purpose": "Letzte Mausaktion: Export starten. Auto-Mode setzt Pfad (Mixdown-Ordner) und Filename (Projektname)"}
+      ],
+      "postcheck_hints": [
+        "Bounce-WAV liegt im Mixdown-Ordner mit Projektnamen",
+        "Loop-Locator ist auf Song-Laenge eingestellt"
+      ],
+      "yoka_notes": "Anwendungsfall: Yoka unterwegs, Remote-Sitzung mit Mac-Claude oder Phone-MCP. Ein Tool-Call -> fertiger Bounce. Voraussetzung: jedes Projekt bekommt ab sofort einen 'EXPORT'-Part als Standard. Recipe-Status SKELETT — die ahk_send_action-Calls brauchen die konkreten AHK-Skripte/Actions in der Mackie-Bridge (vgl. ahk_list_actions). Implementation in Sprint D2."
+    },
+
+    "cleanup_unmute_unsolo_all": {
+      "display_name": "Reset: alle Mutes/Solos lösen",
+      "category": "cleanup",
+      "daw_compat": ["cubase", "ableton"],
+      "description": "Alle Track-Mutes und -Solos zurücksetzen. Klassischer 'Wo bin ich' -Reset.",
+      "preconditions": [],
+      "params_schema": {},
+      "steps": [
+        {"tool": "reset_all_mutes_solos", "args": {}, "purpose": "Alle Mutes + Solos aus"}
+      ],
+      "postcheck_hints": [
+        "Alle Spuren hörbar (sofern Volume nicht -inf)"
+      ],
+      "yoka_notes": "Standard-Reset wenn man im Solo-Workflow den Überblick verloren hat."
+    }
+  }
+}

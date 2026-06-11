@@ -1,0 +1,240 @@
+{
+  "version": "0.3",
+  "last_updated": "2026-05-13",
+  "source_doc": "specs/adr_2026_05_06_plugin_control_architecture.md",
+  "validation_status": "live_validated_2026_05_13_evening",
+  "validation_notes": "Pro-Q3 cross-instance Mappings via Save-as-Default validiert. Kanal-Trennung Bass=1 / Drums=2 / Synth=3 mit M-Form-Test bewiesen — keine Uebersprechung zwischen Bussen. ABENDS 2026-05-13: Routing-Wahrheit live getestet — Cubase-MIDI-Spur ueberschreibt den eingehenden MIDI-Channel auf ihren Track-Channel. Spur-Scharfschaltung ist der eigentliche Bus-Schalter, KI-Send-Channel ist faktisch egal solange Plugin-Channel-Filter die Sicherheits-Backup-Schicht macht.",
+
+  "default_port": "AI_INPUT",
+  "default_port_alternatives": ["XBOARD_BRIDGED", "MASTERPC"],
+
+  "global_conventions": {
+    "midi_channel_per_bus": {
+      "1": "Bass",
+      "2": "Drums",
+      "3": "Synth",
+      "4": "Vocals",
+      "5": "Other",
+      "6": "Guitar",
+      "7": "Percussions",
+      "8": "Backing Vocals",
+      "9_to_15": "Reserve (zukuenftige Stems/FX-Busse)",
+      "16": "Master"
+    },
+    "convention_confirmed_at": "2026-05-13",
+    "convention_source": "Yokas Cubase-Folder 'KI GR FABS ALL' mit 8 Stems + Master als Kanal 16",
+    "midi_track_setup": "Pro Bus eine Cubase-MIDI-Spur in Folder 'KI GR FABS ALL': Input AI_INPUT, Output zur Bus-Spur, Track-Channel nach Konvention oben. Spur MUSS scharf (Record-Enable + Monitor) sein damit MIDI durchgereicht wird — live verifiziert 2026-05-13. Scharfschaltung wirkt bus-spezifisch und ist damit der eigentliche Bus-Schalter (= manueller KI-On/Off pro Bus).",
+    "routing_truth_table": {
+      "_comment": "Live getestet 2026-05-13 abends: KI sendet auf Channel X, nur Spur Y ist scharf (Track-Channel=Y). Beobachtung: Drums-Pro-Q3 reagierte auf KI-Send mit Ch=1, obwohl Plugin-Channel-Filter auf 2 steht — weil Drums-Spur den Channel auf 2 umschreibt.",
+      "rule_1": "Cubase-MIDI-Spur ueberschreibt eingehenden MIDI-Channel auf ihren Track-Channel.",
+      "rule_2": "Nur scharfgeschaltete Spuren reichen MIDI durch (Record-Enable + Monitor).",
+      "rule_3": "KI-Send-Channel ist faktisch egal — Cubase-Spur dominiert. Trotzdem per Konvention auf Bus-Channel senden (semantische Klarheit, Backup falls Plugin-Channel-Filter mal entscheidend wird).",
+      "rule_4": "Plugin-Channel-Filter wirkt als Sicherheits-Backup falls mehrere Spuren parallel scharf sind und Streams Cross-Talk haetten.",
+      "consequence_for_workflow": "Yoka kann KI-Steuerung pro Bus aktiv/inaktiv schalten, einfach durch Spur-Scharfschaltung. Speed-MIDI-Learn-Pattern: Ziel-Spur scharf, alle anderen unscharf, dann CCs feuern — nur die scharfe Plugin-Instanz lernt mit. Kein Cross-Learning-Risiko."
+    },
+    "plugin_channel_filter": "Pro Plugin-Instanz im FabFilter MIDI-Settings den passenden Kanal explizit setzen (Default ist oft Omni — auf Bus-Kanal stellen als Sicherheits-Backup). Wird durch 'Save as Default' NICHT global gespeichert, also pro Plugin-Load manuell. Nicht primaere Trennungs-Schicht (das ist Cubase-Spur-Channel + Scharfschaltung), aber wichtig fuer den Fall mehrerer parallel scharfer Spuren.",
+    "plugin_band_setup": "Pro-Q3 startet immer mit 0 Baendern. Plugin-Preset 'KI_3_Bands_Standard' (oder mit 4-6 Baendern) speichern + ggf. als Plugin-Default markieren — sonst muessen Baender manuell geklickt werden.",
+    "midi_learn_save_default": "Im Pro-Q3 (und anderen FabFilter): kleiner Pfeil neben 'MIDI Learn'-Button -> 'Save as Default'. Damit sind die CC-Mappings global persistent fuer ALLE zukuenftigen Plugin-Instanzen.",
+    "reserved_cc_avoid_list": {
+      "_comment": "CCs die fuer Plugin-Param-Mapping VERMIEDEN werden sollten — sie haben Standard-MIDI-Bedeutung und werden von Cubase/Plugins oft anders interpretiert.",
+      "CC0": "Bank Select MSB",
+      "CC1": "Modulation Wheel",
+      "CC7": "Volume (von DAW reserviert)",
+      "CC10": "Pan (von DAW reserviert)",
+      "CC11": "Expression",
+      "CC32": "Bank Select LSB — BESTAETIGT: wird NICHT von FabFilter Pro-Q3 als regulaerer CC akzeptiert (live festgestellt 2026-05-13). Stattdessen CC38+ verwenden.",
+      "CC64": "Sustain Pedal",
+      "CC120_127": "Channel Mode Messages (All Notes Off etc.)"
+    }
+  },
+
+  "channels": {
+    "1": {
+      "bus_name": "bass",
+      "display_name": "Bass-Bus",
+      "track_examples": ["BASS GR MONO", "BASS MO...GR"],
+      "midi_ctrl_track_name": "BASS MO...GR (in KI GR FABS ALL)",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "slot": 1,
+          "plugin_name": "FabFilter Pro-Q3 (Stereo)",
+          "channel_filter": 1,
+          "cc_mappings": {
+            "20": {"param": "Band 1 Frequency", "range_min": 10.0, "range_max": 30000.0, "unit": "Hz", "mapping_type": "log"},
+            "21": {"param": "Band 1 Gain", "range_min": -30.0, "range_max": 30.0, "unit": "dB", "mapping_type": "linear"},
+            "22": {"param": "Band 1 Q", "range_min": 0.025, "range_max": 40.0, "unit": "ratio", "mapping_type": "log"},
+            "23": {"param": "Band 1 Enabled", "range_min": 0, "range_max": 127, "unit": "bool", "mapping_type": "threshold_64"},
+            "24": {"param": "Band 2 Frequency", "range_min": 10.0, "range_max": 30000.0, "unit": "Hz", "mapping_type": "log"},
+            "25": {"param": "Band 2 Gain", "range_min": -30.0, "range_max": 30.0, "unit": "dB", "mapping_type": "linear"},
+            "26": {"param": "Band 2 Q", "range_min": 0.025, "range_max": 40.0, "unit": "ratio", "mapping_type": "log"},
+            "27": {"param": "Band 2 Enabled", "range_min": 0, "range_max": 127, "unit": "bool", "mapping_type": "threshold_64"},
+            "28": {"param": "Band 3 Frequency", "range_min": 10.0, "range_max": 30000.0, "unit": "Hz", "mapping_type": "log"},
+            "29": {"param": "Band 3 Gain", "range_min": -30.0, "range_max": 30.0, "unit": "dB", "mapping_type": "linear"},
+            "30": {"param": "Band 3 Q", "range_min": 0.025, "range_max": 40.0, "unit": "ratio", "mapping_type": "log"},
+            "31": {"param": "Band 3 Enabled", "range_min": 0, "range_max": 127, "unit": "bool", "mapping_type": "threshold_64"},
+            "38": {"param": "Band 1 Shape (Filter-Type)", "values": ["Bell", "Low Cut", "Low Shelf", "Notch", "High Cut", "High Shelf", "Band Pass", "Tilt Shelf", "Flat Tilt"], "mapping_type": "discrete_9"},
+            "33": {"param": "Band 1 Slope", "values": ["6", "12", "18", "24", "36", "48", "72", "96"], "unit": "dB/oct", "mapping_type": "discrete_8"},
+            "40": {"param": "Band 2 Shape (Filter-Type)", "values": ["Bell", "Low Cut", "Low Shelf", "Notch", "High Cut", "High Shelf", "Band Pass", "Tilt Shelf", "Flat Tilt"], "mapping_type": "discrete_9"},
+            "41": {"param": "Band 2 Slope", "values": ["6", "12", "18", "24", "36", "48", "72", "96"], "unit": "dB/oct", "mapping_type": "discrete_8"},
+            "42": {"param": "Band 3 Slope", "values": ["6", "12", "18", "24", "36", "48", "72", "96"], "unit": "dB/oct", "mapping_type": "discrete_8"},
+            "43": {"param": "Band 3 Shape (Filter-Type)", "values": ["Bell", "Low Cut", "Low Shelf", "Notch", "High Cut", "High Shelf", "Band Pass", "Tilt Shelf", "Flat Tilt"], "mapping_type": "discrete_9"}
+          },
+          "midi_learn_validated": true,
+          "validation_date": "2026-05-13",
+          "notes": "Mappings via Save-as-Default global. Plugin-Preset mit Baendern muss separat als Cubase- oder Plugin-Preset gespeichert sein. Shape + Slope dazugelernt 2026-05-13 nachmittags."
+        },
+        "fabfilter_pro_c2": {
+          "slot": 2,
+          "plugin_name": "FabFilter Pro-C 2 (Mono)",
+          "channel_filter": 1,
+          "cc_mappings": {
+            "48": {"param": "Threshold", "range_min": -60.0, "range_max": 0.0, "unit": "dB", "mapping_type": "linear"},
+            "49": {"param": "Ratio", "range_min": 1.0, "range_max": 99.0, "unit": "ratio", "mapping_type": "log"},
+            "50": {"param": "Attack", "range_min": 0.05, "range_max": 500.0, "unit": "ms", "mapping_type": "log"},
+            "51": {"param": "Release", "range_min": 5.0, "range_max": 3000.0, "unit": "ms", "mapping_type": "log"},
+            "52": {"param": "Knee", "range_min": 0.0, "range_max": 72.0, "unit": "dB", "mapping_type": "linear"},
+            "53": {"param": "Range", "range_min": 0.0, "range_max": 60.0, "unit": "dB", "mapping_type": "linear"},
+            "54": {"param": "Lookahead", "range_min": 0.0, "range_max": 20.0, "unit": "ms", "mapping_type": "linear"},
+            "55": {"param": "Hold", "range_min": 0.0, "range_max": 500.0, "unit": "ms", "mapping_type": "log"},
+            "56": {"param": "Wet Gain", "range_min": -36.0, "range_max": 36.0, "unit": "dB", "mapping_type": "linear", "note": "Output-Gain nach Compression"},
+            "57": {"param": "Dry Gain", "range_min": -36.0, "range_max": 36.0, "unit": "dB", "mapping_type": "linear", "note": "Fuer Parallel-Comp NY-Style"}
+          },
+          "midi_learn_validated": true,
+          "validation_date": "2026-05-13",
+          "notes": "Gelernt mit Akai APC Key25 (CC48-55) + KI (CC56-57 Wet/Dry Gain), Save-as-Default global. Live getestet: CC48=90 auf Kanal 2 -> Drums Pro-C 2 Threshold auf -17.48 dB. Sidechain-Sektion bewusst NICHT gemappt (typisch fix per Track-Preset)."
+        },
+        "fabfilter_saturn2": {
+          "slot": 3,
+          "plugin_name": "FabFilter Saturn 2",
+          "channel_filter": 1,
+          "cc_mappings": {
+            "_placeholder": "noch nicht gelernt — geplant CC50-55 fuer Drive/Mix/Band-Drives"
+          },
+          "midi_learn_validated": false
+        }
+      }
+    },
+    "2": {
+      "bus_name": "drums",
+      "display_name": "Drums-Bus",
+      "track_examples": ["2 Drums", "DRUMS"],
+      "midi_ctrl_track_name": "DRUMS (in KI GR FABS ALL)",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "slot": 1,
+          "plugin_name": "FabFilter Pro-Q3 (Stereo)",
+          "channel_filter": 2,
+          "cc_mappings": "inherits_from_save_as_default",
+          "validation_date": "2026-05-13",
+          "notes": "Mappings vererbt von Save-as-Default. Channel-Filter 2 manuell gesetzt. Live getestet mit CC23/CC21 (Band 1 Enable + Gain max) — Plugin reagiert, Bass-Pro-Q3 bleibt unveraendert."
+        }
+      }
+    },
+    "3": {
+      "bus_name": "synth",
+      "display_name": "Synth-Bus",
+      "track_examples": ["5 Synth", "SYNTH"],
+      "midi_ctrl_track_name": "SYNTH (in KI GR FABS ALL)",
+      "plugins": {
+        "fabfilter_pro_q3": {
+          "slot": 1,
+          "plugin_name": "FabFilter Pro-Q3 (Stereo)",
+          "channel_filter": 3,
+          "cc_mappings": "inherits_from_save_as_default",
+          "validation_date": "2026-05-13",
+          "notes": "Live getestet mit 6-CC-Sequenz (Band 1+3 Boost +30 dB, Band 2 Cut -30 dB). M-Form perfekt erzeugt. Bass + Drums Pro-Q3 unveraendert. Wichtig: Plugin startet ohne Baender, muss Preset 'KI_3_Bands_Standard' oder Doppelklick ins Spektrum vor Mapping-Wirkung."
+        }
+      }
+    },
+    "4": {
+      "bus_name": "vocals",
+      "display_name": "Vocals-Bus",
+      "track_examples": ["VOCALS"],
+      "midi_ctrl_track_name": "VOCALS (in KI GR FABS ALL)",
+      "plugins": {
+        "_placeholder": "Plugin-Setup noch nicht erfolgt. Bei Bedarf Pro-Q3 + Pro-C 2 + Saturn 2 laden, Mappings via Save-as-Default automatisch da, Channel-Filter manuell auf 4."
+      }
+    },
+    "5": {
+      "bus_name": "other",
+      "display_name": "Other-Bus",
+      "track_examples": ["OTHER"],
+      "midi_ctrl_track_name": "OTHER (in KI GR FABS ALL)",
+      "plugins": {"_placeholder": "Plugin-Setup noch nicht erfolgt."}
+    },
+    "6": {
+      "bus_name": "guitar",
+      "display_name": "Guitar-Bus",
+      "track_examples": ["GUITAR", "Akkustik Gitarre"],
+      "midi_ctrl_track_name": "GUITAR (in KI GR FABS ALL)",
+      "plugins": {"_placeholder": "Plugin-Setup noch nicht erfolgt."}
+    },
+    "7": {
+      "bus_name": "percussions",
+      "display_name": "Percussions-Bus",
+      "track_examples": ["PERCUSSIONS", "4 Percussion"],
+      "midi_ctrl_track_name": "PERCUSSIONS (in KI GR FABS ALL)",
+      "plugins": {"_placeholder": "Plugin-Setup noch nicht erfolgt."}
+    },
+    "8": {
+      "bus_name": "backing_vocals",
+      "display_name": "Backing Vocals-Bus",
+      "track_examples": ["BACKING VOCALS", "1 Backing Vocals"],
+      "midi_ctrl_track_name": "BACKING VOCALS (in KI GR FABS ALL)",
+      "plugins": {"_placeholder": "Plugin-Setup noch nicht erfolgt."}
+    },
+    "9_to_15": {
+      "_comment": "Reserve fuer weitere Stems/FX-Busse. Konvention bleibt: pro Bus eigener Kanal, MIDI-Spur in KI GR FABS ALL Folder."
+    },
+    "16": {
+      "bus_name": "master",
+      "display_name": "Master-Bus",
+      "track_examples": ["Master"],
+      "midi_ctrl_track_name": "MASTER (in KI GR FABS ALL) — geplant",
+      "plugins": {
+        "_placeholder": "Master-Bus-Setup steht noch aus. Wahrscheinlich Pro-Q3 + Pro-C 2 + Saturn 2 + Mastering-the-Mix-LIMITER. Channel-Filter pro Plugin auf 16."
+      }
+    }
+  },
+
+  "cc_safe_zones": {
+    "_comment": "CC-Belegung pro Plugin-Familie nach 2026-05-13 Live-Validation. CC32 vermieden (Bank Select LSB).",
+    "pro_q3": {
+      "range": "CC20-43",
+      "used": "CC20-31 (Band 1-3 F/G/Q/A), CC33 (Band 1 Slope), CC38 (Band 1 Shape), CC40-43 (Band 2-3 Shape/Slope)",
+      "pufferzone": "CC44-47 frei fuer kuenftige Pro-Q3-Features (Active Band Nav, Output Gain, etc.)"
+    },
+    "pro_c2": {
+      "range": "CC48-57",
+      "used_validated_2026_05_13": "CC48 Threshold, CC49 Ratio, CC50 Attack, CC51 Release, CC52 Knee, CC53 Range, CC54 Lookahead, CC55 Hold, CC56 Wet Gain, CC57 Dry Gain",
+      "pufferzone": "CC58-59 frei",
+      "not_mapped": "Sidechain-Sektion (HP/LP, External, Stereo-Mode) — typisch fix per Track-Preset"
+    },
+    "saturn2_planned": {
+      "range": "CC60-79",
+      "planned": "Master Drive, Mix, Band-Drives Band 1-6, Modulator-Slots"
+    },
+    "additional_features": {
+      "range": "CC80-119",
+      "ideas": "Mastering the Mix Plugins, Eventide-Effekte, Spezial-Features. CC120-127 sind Channel Mode Messages — vermeiden."
+    }
+  },
+
+  "live_send_examples": {
+    "_comment": "Beispiel-Aufrufe fuer die KI bei spaeteren Sessions.",
+    "boost_bass_band1_at_30hz": {
+      "description": "Bass Pro-Q3 Band 1 als HP @ 30 Hz aktivieren",
+      "calls": [
+        {"cc": 23, "value": 127, "channel": 0, "note": "Band 1 Enable"},
+        {"cc": 20, "value": 17, "channel": 0, "note": "30 Hz in log 10-30000 Range = ~CC 17"}
+      ]
+    },
+    "set_drums_band2_mud_cut_minus_2db_at_300hz": {
+      "calls": [
+        {"cc": 27, "value": 127, "channel": 1, "note": "Drums Band 2 Enable"},
+        {"cc": 24, "value": 73, "channel": 1, "note": "300 Hz in log 10-30000 Range"},
+        {"cc": 25, "value": 60, "channel": 1, "note": "-2 dB in [-30, +30] linear Range"}
+      ]
+    }
+  }
+}

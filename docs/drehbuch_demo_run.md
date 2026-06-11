@@ -143,13 +143,13 @@
 
 ## Take 3 — Plugin-Parameter-Steuerung: generische Mechanik (FREE) + Demo
 
-**Free liefert die Mechanik, nicht die volle Abdeckung.** Über die Cubase MIDI Remote API (`makeValueBinding`) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das **Steuer-JS ist plugin-agnostisch** (generische Slot×Param→CC-Bindings, 0 Plugin-Namen) und damit Free. Was Free **nicht** mitliefert, ist die volle Plugin-Map:
+**Die Mechanik ist voll dabei — die Plugin-Map ist user-spezifisch.** Über die Cubase MIDI Remote API (`makeValueBinding`) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das **Steuer-JS ist plugin-agnostisch** (generische Slot×Param→CC-Bindings, 0 Plugin-Namen). Mitgeliefert ist eine **Demo-CC-Map** (1 Stock-Plugin je Kategorie) zum Ausprobieren; deine **volle Plugin-Abdeckung** entsteht aus deinem eigenen Scan (jede Cubase-Installation hat ein anderes Arsenal):
 
-| | Free | Premium |
+| | im Repo | dein Setup |
 |---|---|---|
-| Generische Steuer-Mechanik (`ki_studio_value_remote.js`, Generator, Scanner) | ✅ | ✅ (Overlay) |
-| Plugin-Map | **Demo: 2 echte Stock-Plugins je Kategorie** | **volle Abdeckung** (alle gescannten Stock + Drittanbieter) |
-| „welcher Wert klingt richtig?" (Nicker-Wissen) | — | ✅ |
+| Generische Steuer-Mechanik (`ki_studio_value_remote.js`, Generator, Scanner) | ✅ | — |
+| Plugin-Map | **Demo (1 Stock-Plugin je Kategorie)** | **volle Abdeckung via eigenem Scan** |
+| Nicker-Wissen („welcher Wert klingt richtig?") | ✅ | — |
 
 **Live verifiziert (2026-06-09):** KI bewegte **StudioEQ „1 Gain"** (Cubase-Stock) — Wert fuhr sichtbar im Plugin-GUI.
 
@@ -157,9 +157,9 @@
 - Stock-Plugin aus der **Demo-Map** auf eine Spur (z. B. **StudioEQ** oder **Frequency**), GUI offen
 - KI setzt einen Parameter (z. B. StudioEQ Band-1-Gain) per `nicker_set_plugin_param` → **Wert fährt live im GUI**
 - A/B: zweiter Wert, zurück — sichtbar + hörbar
-- *Mechanik + Demo-Plugins = Free.* Die **volle Plugin-Abdeckung** (eigener Scan deiner Plugins) sowie die Frage **„welcher Wert klingt nach Trip-Hop-Wärme?"** sind **Premium** (Nicker-Wissen) — bzw. der Nutzer scannt sein Sortiment selbst mit dem Free-Scanner.
+- Für deine **volle Plugin-Abdeckung** scannst du dein eigenes Sortiment mit dem mitgelieferten Scanner.
 
-**Mechanismus:** Der Free-Scanner (`outputs/parse_param_scan.py` + `ki_studio_param_scan.js`) erzeugt aus deinem eigenen Plugin-Scan eine **Param-Map**; der Generator (`outputs/generate_value_bindings.py`) baut daraus das generische Steuer-JS. **Free-Beileger:** `cubase_plugin_param_map_demo.json` (2 echte Stock-Plugins je Kategorie). Die **volle** `cubase_plugin_param_map.json` + `cubase_value_cc_map.json` sind nicht im Free-Repo. Adressierung über Port `AI_VAL`, Channel = Insert-Slot. Details: [`specs/spec_2026_06_09_plugin_value_bindings.md`](../specs/spec_2026_06_09_plugin_value_bindings.md).
+**Mechanismus:** Der Scanner (`outputs/parse_param_scan.py` + `ki_studio_param_scan.js`) erzeugt aus deinem eigenen Plugin-Scan eine **Param-Map**; der Generator (`outputs/generate_value_bindings.py`) baut daraus das generische Steuer-JS. **Mitgeliefert:** `cubase_plugin_param_map_demo.json` (1 Stock-Plugin je Kategorie). Die **vollen** Maps (`cubase_plugin_param_map.json` + `cubase_value_cc_map.json`) sind dein persönlicher Scan und nicht im Repo. Adressierung über Port `AI_VAL`, Channel = Insert-Slot. Details: [`specs/spec_2026_06_09_plugin_value_bindings.md`](../specs/spec_2026_06_09_plugin_value_bindings.md).
 
 ---
 

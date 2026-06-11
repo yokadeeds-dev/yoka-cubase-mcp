@@ -4,33 +4,34 @@
 
 > *Die KI muss nicht hören wie ein Mensch — sie muss verstehen: präzise, semantisch, kontinuierlich.*
 
-> 🚧 **Das Premium-Add-On (Mixing-/Mastering-Wissen) erscheint in Kürze** — die GitHub-Sponsors-Seite wird gerade freigeschaltet (voraussichtlich Mitte Juni 2026). Der freie Kern hier ist ab sofort voll nutzbar; Details im Abschnitt [Premium-Add-On](#-premium-add-on-nicker-mixingmastering-wissen) unten.
-
 ---
 
 ## Was das ist
 
-Ein **MCP-Server mit 40 Tools**, ansprechbar von Claude Code (oder jedem MCP-Client) aus. Die zentrale Idee: Statt eine DAW per fragiler UI-Automation oder geschlossener Hersteller-API zu steuern, sprechen wir das **MCU-Protokoll** — dasselbe, das physische Mixer-Controller (Mackie Control, Behringer X-Touch) seit 30 Jahren nutzen. Jede MCU-fähige DAW versteht es nativ, bidirektional und in Echtzeit.
+Ein **MCP-Server mit 64 Tools**, ansprechbar von Claude Code (oder jedem MCP-Client) aus. Die zentrale Idee: Statt eine DAW per fragiler UI-Automation oder geschlossener Hersteller-API zu steuern, sprechen wir das **MCU-Protokoll** — dasselbe, das physische Mixer-Controller (Mackie Control, Behringer X-Touch) seit 30 Jahren nutzen. Jede MCU-fähige DAW versteht es nativ, bidirektional und in Echtzeit. Obendrauf sitzt **Nicker** — ein Mixing-/Mastering-Wissens-Layer (Audio-Analyse, Mastering-Chains, Frequenz-/Masking-Advice, Plugin-Steuerung).
+
+**Voller Funktionsumfang, offen.** Es gibt kein Premium-Gate — der komplette Code steht unter AGPL-3.0 (+ kommerzielle Lizenz). [Sponsoring](#sponsoring) ist freiwillige Unterstützung, kein Zugangsschlüssel.
 
 Drei Bridge-Layer:
 
 | Layer | Macht | Kanal |
 |---|---|---|
 | **Mackie (MCU)** | Mode, Track-Select, Volume, Transport, Plugin-Pages — **closed-loop-verifiziert** | MIDI via loopMIDI/IAC |
-| **AHK** | Hotkey-Bridge für Cubase-**Standard-Commands** (die mit eigenem Hotkey) + Macros | synthetische Keystrokes |
-| **MIDI-Send** | Note-On/Off für Recording + generische Command-/Plugin-Steuer-Mechanik via Cubase MIDI Remote API | MIDI via loopMIDI |
+| **AHK** | Hotkey-Bridge für Cubase-**Commands** (Standards + volle Belegung) + Macros | synthetische Keystrokes |
+| **MIDI-Send** | Note-On/Off für Recording + Command-/Plugin-Steuerung via Cubase MIDI Remote API | MIDI via loopMIDI |
 
 **DAW-Kompatibilität — nach Layer:**
 
 - **Mackie/MCU** (Mode, Track-Select, Volume, Transport, Plugin-Pages, State-Mirror): reines MCU-Protokoll → jede MCU-fähige DAW. **Live verifiziert: Cubase + Ableton Live 12** (Mode-Wechsel, Track-Select, State-Mirror closed-loop bestätigt). Sollte ebenso mit Nuendo, Studio One, Reaper, Bitwig, Logic, FL Studio laufen — ungetestet, Feedback willkommen. Der MCU-Funktionsumfang variiert je nach DAW.
-- **AHK-Hotkey-Bridge** (Standard-Commands, Macros): Hotkeys sind **DAW-spezifisch** — Maps für Cubase + Ableton vorhanden, andere DAWs brauchen eine eigene Map.
+- **AHK-Hotkey-Bridge** (Commands, Macros): Hotkeys sind **DAW-spezifisch** — Maps für Cubase + Ableton vorhanden, andere DAWs brauchen eine eigene Map.
 - **Plugin-/Command-Steuerung via MIDI Remote**: **Cubase-spezifisch** (Cubase MIDI Remote API).
 
 **Kerneigenschaften:**
 - **Closed-Loop:** Jede Steuer-Aktion wartet auf das DAW-Echo und meldet `verified: true/false` — kein Hoffen, dass ein Befehl ankam.
 - **State-Mirror:** `get_daw_state` liefert jederzeit Mode, Transport, aktive Spur, 8 sichtbare Strips mit Volume/Mute/Solo/VU — ohne Screenshot.
-- **Command-Steuerung (Standards + Mechanik):** Cubase-**Standard-Commands** (die einen eigenen Hotkey haben) sind direkt nutzbar. Die **Generatoren** für die volle MIDI-Remote-Command-Belegung liegen bei (`generate_cubase_midi_remote.py`) — die **vorgefertigte volle Belegung** aller ~1559 ungebundenen Commands ist Teil des **Premium-Add-Ons**.
-- **Plugin-Parameter-Steuerung (abgespeckt):** Über `makeValueBinding` (Cubase MIDI Remote API) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn. Das MCP-Tool **`nicker_set_plugin_param`** (Plugin by name) ist **im Free dabei** — abgespeckt auf **1 echtes Stock-Plugin je Kategorie** (Demo-CC-Map: StudioEQ, Compressor, Magneto II, AutoFilter, Chorus, StereoDelay, REVerence, Pitch Correct, StereoEnhancer, Tuner). Plus rohe CC-Steuerung (`nicker_send_midi_cc`), Scanner + Generatoren für eigene Plugins. Live verifiziert (KI bewegte StudioEQ „1 Gain"). Die **volle Plugin-Abdeckung** (alle Plugins) und das Wissen „welcher Wert klingt richtig" liefert das **Premium-Add-On**.
+- **Command-Steuerung:** Cubase-**Standard-Commands** (mit eigenem Hotkey) direkt nutzbar; für die **volle Belegung** aller ~1559 ungebundenen Commands liegen die Generatoren *und* die fertige MIDI-Remote-Map bei.
+- **Plugin-Parameter-Steuerung:** Über `makeValueBinding` (Cubase MIDI Remote API) ist **jeder vom Host veröffentlichte VST-Parameter** adressierbar — unabhängig von plugin-internem MIDI-Learn (`nicker_set_plugin_param`, Plugin by name). Live verifiziert (KI bewegte StudioEQ „1 Gain"). Mitgeliefert ist eine **Demo-CC-Map** (1 Stock-Plugin je Kategorie); deine volle Plugin-Abdeckung **scannst du selbst** mit `nicker_sync_plugins_from_cubase` (siehe [User-Daten](#user-spezifische-daten)).
+- **Nicker-Wissens-Layer:** Audio-Analyse (LUFS/Spektrum/True-Peak), Mastering-Chains pro Genre×Plattform, EQ-/Masking-Advice pro Track-Rolle, Mix-Presets, Plugin-Registry.
 - **Plattform-portierbar:** Windows produktiv getestet; macOS-Implementierung als Stub vorhanden.
 
 ## Architektur
@@ -39,7 +40,7 @@ Drei Bridge-Layer:
 ┌─────────────────────────────────────────────────────────────┐
 │  Claude Code (oder anderer MCP-Client)                       │
 └──────────────────────┬──────────────────────────────────────┘
-                       │ stdio MCP-Protokoll · 40 Tools
+                       │ stdio MCP-Protokoll · 64 Tools
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  yoka-cubase-mcp MCP-Server                                  │
@@ -60,15 +61,22 @@ Drei Bridge-Layer:
 └─────────────────────────────────────────────┘
 ```
 
-## Tools-Übersicht (40)
+## Tools-Übersicht (64)
 
 | Gruppe | Beispiele | Zone |
 |---|---|---|
 | **State (read-only)** | `get_daw_state`, `get_active_track`, `get_active_plugin`, `list_tracks`, `list_connected_daws` | grün |
 | **Mackie-Steuerung** | `set_mode`, `select_track`, `bank_left/right`, `channel_left/right`, `transport_play/stop`, `plugin_page_next/prev` | gelb |
 | **Volume** | `set_track_volume`, `set_track_volume_db` | gelb |
-| **AHK** | `ahk_list_actions`, `ahk_send_action` (Cubase-Standard-Commands + Macros), `save_project`, `undo`, `redo` | gelb/rot |
-| **MIDI-Send + Plugin** | `send_midi_note(_sequence)`, `send_cubase_command` (Command by name — volle Map = Premium), `nicker_send_midi_cc(_pct/_range)`, `nicker_set_plugin_param` (1 Stock-Plugin/Kategorie; volle Abdeckung = Premium) | gelb |
+| **AHK** | `ahk_list_actions`, `ahk_send_action` (Commands + Macros), `save_project`, `undo`, `redo` | gelb/rot |
+| **MIDI-Send + Plugin** | `send_midi_note(_sequence)`, `send_cubase_command` (Command by name), `nicker_send_midi_cc(_pct/_range)`, `nicker_set_plugin_param` | gelb |
+| **Nicker — Mastering** | `nicker_suggest_mastering_chain`, `nicker_list_mastering_genres`, `nicker_list_mastering_platforms` | grün/gelb |
+| **Nicker — Mix/Frequenz** | `nicker_freq_advice`, `nicker_find_masking_conflicts`, `nicker_suggest_track_settings`, `nicker_apply_preset`, `nicker_list_mix_presets` | grün/gelb |
+| **Nicker — Audio-Analyse** | `nicker_analyze_audio_file`, `nicker_audit_audio_file`, `nicker_compare_audio_files` | grün |
+| **Nicker — Plugin-Registry** | `nicker_lookup_plugin`, `nicker_get_plugin_details`, `nicker_plugin_registry_stats`, `nicker_sync_plugins_from_cubase` | grün/gelb |
+| **Nicker — Wissensbasis** | `nicker_search_studium`, `nicker_get_studium_doc`, `nicker_list_studium_docs` *(optionales YMP-Repo)* | grün |
+| **FabFilter / Reaktionen** | `nicker_set_pro_q3_band`, `nicker_set_pro_c2`, `nicker_log_reaction`, `nicker_reaction_summary` | gelb/grün |
+| **Traktor / DAWproject** | `get_traktor_state`, DAWproject-Export | grün |
 | **Session-Log** | `start_session_log`, `get_session_summary`, `get_session_report` | grün |
 | **Cubase-Inspector** | `validate_cubase_port_setup`, `list_cubase_audio_drivers` | grün |
 | **Transport (aufnehmend)** | `transport_record` | rot |
@@ -76,21 +84,12 @@ Drei Bridge-Layer:
 
 **Zone-Semantik:** grün = read-only, gelb = mutiert DAW-State (undobar), rot = destruktiv/explizite Intent nötig.
 
-## ⭐ Premium-Add-On: Nicker (Mixing/Mastering-Wissen)
+## User-spezifische Daten
 
-Dieser Kern liefert die **generische Steuer-Mechanik + Cubase-Standards + eine Demo-Plugin-Map (1 Stock-Plugin/Kategorie)**. Das optionale **[yoka-cubase-premium](https://github.com/yokadeeds-dev/yoka-cubase-premium)**-Add-On ergänzt die **volle Belegung + Abdeckung + das Mixing/Mastering-Wissen**:
+Der **Code** deckt den vollen Funktionsumfang ab — zwei Datensätze sind aber an *dein* Setup gebunden und werden nicht mitgeliefert:
 
-- **Volle Command-Belegung:** alle ~1559 vormals nicht-zugewiesenen Cubase-Commands fertig per Hotkey/MIDI gemappt (statt nur der Standards)
-- **Volle Plugin-Abdeckung:** komplette gescannte Param-/CC-Map (alle Stock- + Drittanbieter-Plugins) statt nur 1 Demo-Plugin je Kategorie
-- Audio-Analyse (LUFS / Spektrum / True-Peak)
-- Mastering-Chain-Empfehlungen pro Genre × Plattform
-- EQ-/Masking-Advice pro Track-Rolle, `nicker_*`-Tools (~30)
-- FabFilter Pro-Q3 / Pro-C2 per MIDI-Learn setzen
-- Traktor-Deck-Observer, DAWproject-Writer
-
-**Zugang — erscheint in Kürze 🚧:** Das Premium-Add-On kommt über **[GitHub Sponsors](https://github.com/sponsors/yokadeeds-dev)**; die Sponsors-Seite wird gerade freigeschaltet (vsl. Mitte Juni 2026). Geplant: ab **Producer-Tier (15 €/Monat)** automatischer Zugriff auf den privaten Premium-Repo inkl. aller Updates ([Tiers](SPONSORS.md)).
-
-Der Server erkennt das Add-On automatisch (`_premium_in_same_runtime()`). Ohne Add-On läuft er als Free-Build: die Steuer-Tools (`nicker_send_midi_cc`, `nicker_set_plugin_param` mit Demo-CC-Map) bleiben aktiv, die `nicker_*`-Wissens-Tools (Audio/Mastering/EQ/Registry) sind ausgeblendet.
+- **Plugin-Inventar / volle CC-Map:** Jede Cubase-Installation hat ein anderes Plugin-Arsenal. Scanne deins mit `nicker_sync_plugins_from_cubase` (bzw. `python -m runtime.persona.cubase_plugin_sync --apply`). Ohne Scan läuft der Server normal, die Plugin-Registry ist nur leer. Mitgeliefert ist eine Demo-CC-Map (1 Stock-Plugin/Kategorie) zum Ausprobieren.
+- **YMP-Wissensbasis (Volltexte):** Die `nicker_search/get_studium_*`-Tools lesen aus einem separaten Wissens-Repo. Setze `YMP_PATH` oder lege es als Sibling-Verzeichnis ab; fehlt es, sind nur diese drei Tools inaktiv. Die strukturierten Wissens-JSONs (Mastering-Chains, Frequenz-Advice, Mix-Presets) sind dagegen dabei.
 
 ## Repo-Struktur
 
@@ -99,13 +98,17 @@ yoka-cubase-mcp/
 ├── README.md · LICENSE (AGPL-3.0) · LICENSING.md · CONTRIBUTING.md · requirements.txt
 ├── runtime/
 │   ├── mackie/        ← MCU-Kern: parser, state, listener, sender, closedloop, units
-│   ├── ahk/           ← Hotkey-Bridge-Mechanik (Standard-Commands; volle Patch-Map = Premium)
-│   ├── midi_bridge/   ← Note-Send + Command-Resolver + Demo-Plugin-Map (volle Maps = Premium)
+│   ├── ahk/           ← Hotkey-Bridge (Standard-Commands + volle Patch-Map)
+│   ├── midi_bridge/   ← Note-Send + Command-Resolver + Command-MIDI-Map + Demo-Plugin-Map
 │   ├── midi_remote/   ← Cubase-MIDI-Remote-Scripts (generisch: Command- + Value-Steuer-JS)
+│   ├── persona/       ← Nicker: Mastering, Frequenz-Advice, Audio-Analyse, Plugin-Registry, Wissens-Loader
+│   ├── traktor/       ← Traktor-Deck-Observer
+│   ├── dawproject/    ← DAWproject-Export
 │   ├── osc/           ← OSC-Bridge
 │   ├── setup/         ← Cubase Port-Setup-Parser
 │   ├── audio/         ← Playback
-│   └── mcp/server.py  ← 40 Core-Tools (Premium-Hook für Add-On)
+│   └── mcp/server.py  ← 64 MCP-Tools
+├── skills/ki-studio-nicker/  ← Nicker-Persona als Claude-Code-Skill
 ├── docs/              ← Setup-Guides, Demo-Workflows, Keymap-Export
 ├── specs/             ← Mackie-Map, Architektur-Notizen
 └── tests/selftests/   ← Offline-Selftests + Live-Smoketests
@@ -150,7 +153,7 @@ DAW-seitiges Setup (Mackie-Control-Device in Cubase, loopMIDI): [`docs/01_setup_
 }
 ```
 
-Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze den Lead-Synth auf −3 dB"*, *„nimm eine C-Dur-Tonleiter auf der scharfgeschalteten Spur auf"*.
+Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze den Lead-Synth auf −3 dB"*, *„welche Mastering-Chain für Trip-Hop?"*, *„nimm eine C-Dur-Tonleiter auf der scharfgeschalteten Spur auf"*.
 
 ## Status
 
@@ -158,20 +161,25 @@ Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze d
 |---|---|
 | Mackie-Listener + Parser + State-Mirror | ✅ produktiv |
 | Sender + Closed-Loop-Verifikation | ✅ produktiv |
-| MCP-Server (40 Core-Tools) | ✅ produktiv |
-| AHK-Bridge-Mechanik (Standard-Commands + Macros) | ✅ produktiv |
-| Generische Command-/Plugin-Steuer-Mechanik (MIDI Remote) | ✅ live verifiziert (volle Belegungs-/Plugin-Maps = Premium) |
+| MCP-Server (64 Tools) | ✅ produktiv |
+| AHK-Bridge (Standard-Commands + volle Belegung + Macros) | ✅ produktiv |
+| Command-/Plugin-Steuer-Mechanik (MIDI Remote) | ✅ live verifiziert |
+| Nicker (Mastering/Frequenz/Audio-Analyse) | ✅ produktiv |
 | MIDI-Note-Recording (autonom) | ✅ end-to-end verifiziert |
 | macOS-Port | ⏳ Stub, ungetestet |
+
+## Sponsoring
+
+Der volle Funktionsumfang ist frei (AGPL-3.0). Wenn dir das Projekt hilft, kannst du die Entwicklung über **[GitHub Sponsors](https://github.com/sponsors/yokadeeds-dev)** unterstützen — das ist eine freiwillige Spende, **kein** Zugangs-Gate und schaltet nichts zusätzlich frei. Details: [`SPONSORS.md`](SPONSORS.md).
 
 ## Lizenz
 
 **Dual-Lizenz** (Details in [`LICENSING.md`](LICENSING.md)):
 
 - **[AGPL-3.0](LICENSE)** für offene Nutzung — Copyleft + Netzwerk-Klausel (§13): wer eine modifizierte Version als Netzwerk-Dienst betreibt, muss den Quellcode offenlegen.
-- **Kommerzielle Lizenz** für proprietäre Einbettung ohne AGPL-Pflichten — auf Anfrage.
+- **Kommerzielle Lizenz** für proprietäre Einbettung ohne AGPL-Pflichten — auf Anfrage (yoka@provolution.org).
 
-© 2026 Yoka. Der Premium-Wissens-Layer ([`yoka-cubase-premium`](https://github.com/yokadeeds-dev/yoka-cubase-premium)) ist separat (privat) lizenziert. Beiträge: siehe [`CONTRIBUTING.md`](CONTRIBUTING.md).
+© 2026 Yoka. Beiträge: siehe [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Credits
 

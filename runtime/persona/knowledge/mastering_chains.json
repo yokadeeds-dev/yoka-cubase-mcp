@@ -1,0 +1,635 @@
+{
+  "version": "0.1",
+  "last_updated": "2026-05-04",
+  "source_doc": "YMP/Studium/21_Mastering_Finalizing.md",
+  "notes": "Erst-Ausarbeitung basierend auf YMP-Doc 21. LUFS-Targets sind Branchen-Standards Stand 2024-2026 — von Yoka fachlich zu prüfen/erweitern. Genre-Liste ist Start-Set, nicht erschöpfend.",
+
+  "platforms": {
+    "spotify": {
+      "display_name": "Spotify",
+      "target_lufs_integrated": -14,
+      "true_peak_db": -1,
+      "normalization": "on_default",
+      "notes": "Lautere Tracks werden runter normalisiert; verlieren Dynamik. Optimal: Master nahe -14 LUFS, Dynamik bewahren."
+    },
+    "apple_music": {
+      "display_name": "Apple Music",
+      "target_lufs_integrated": -16,
+      "true_peak_db": -1,
+      "normalization": "on_sound_check",
+      "notes": "Sound Check standardmäßig aktiv. Ziel niedriger als Spotify — mehr Dynamik-Reserve."
+    },
+    "youtube": {
+      "display_name": "YouTube / YouTube Music",
+      "target_lufs_integrated": -14,
+      "true_peak_db": -1,
+      "normalization": "on",
+      "notes": "Normalisierung auf -14 LUFS, lautere Tracks werden runtergeregelt."
+    },
+    "tidal": {
+      "display_name": "Tidal",
+      "target_lufs_integrated": -14,
+      "true_peak_db": -1,
+      "normalization": "on",
+      "notes": "Vergleichbar Spotify. HiFi/Master-Tier nutzt Original-Master."
+    },
+    "soundcloud": {
+      "display_name": "SoundCloud",
+      "target_lufs_integrated": -10,
+      "true_peak_db": -0.3,
+      "normalization": "off",
+      "notes": "Keine Auto-Normalisierung. Range -8 bis -11 LUFS akzeptabel."
+    },
+    "club_dj": {
+      "display_name": "Club / DJ-Set",
+      "target_lufs_integrated": -8,
+      "true_peak_db": -0.3,
+      "normalization": "none",
+      "notes": "Maximale Lautheit für Sound-System-Wiedergabe. DJ-Mixer hat eigene Headroom-Strategie."
+    },
+    "vinyl": {
+      "display_name": "Vinyl",
+      "target_lufs_integrated": null,
+      "true_peak_db": -3,
+      "normalization": "physical",
+      "notes": "LUFS irrelevant; Peak-Kontrolle und Mono-Bass kritisch. Cutting-Engineer macht finale Anpassungen."
+    },
+    "cd_redbook": {
+      "display_name": "CD (Red Book Standard)",
+      "target_lufs_integrated": -10,
+      "true_peak_db": -0.1,
+      "normalization": "none",
+      "notes": "16-Bit @ 44.1 kHz mit Dither (POW-r 2 oder Apogee UV22HR). PQ-Codes, ISRC, 2 s Pause."
+    }
+  },
+
+  "generic_chain": [
+    {
+      "step_id": "high_pass",
+      "order": 1,
+      "display_name": "High-Pass Filter",
+      "type": "eq",
+      "params": {
+        "cutoff_hz": 30,
+        "slope_db_oct": 24
+      },
+      "purpose": "Subsonic-Rumpeln entfernen, Headroom sparen.",
+      "optional": false
+    },
+    {
+      "step_id": "corrective_eq",
+      "order": 2,
+      "display_name": "Korrigierender EQ",
+      "type": "eq",
+      "params": {
+        "approach": "subtractive",
+        "q_factor_range": [0.5, 1.0],
+        "linear_phase": false,
+        "typical_moves": [
+          { "freq_hz": 250, "gain_db": -1, "purpose": "Boxiness reduzieren" },
+          { "freq_hz": 3000, "gain_db": 0.5, "purpose": "Präsenz" },
+          { "freq_hz": 8000, "gain_db": -1, "purpose": "Harshness zähmen" }
+        ]
+      },
+      "purpose": "Probleme beheben, nicht kreativ gestalten.",
+      "optional": false
+    },
+    {
+      "step_id": "compressor",
+      "order": 3,
+      "display_name": "Master-Kompressor (Glue)",
+      "type": "compressor",
+      "params": {
+        "ratio_range": [1.5, 2.0],
+        "attack_ms_range": [30, 50],
+        "release_ms_range": [200, 400],
+        "release_auto": true,
+        "gain_reduction_db_max": 2,
+        "knee": "soft"
+      },
+      "purpose": "Subtle 'Klebstoff' zwischen Elementen, kein Pumpen.",
+      "optional": true,
+      "default_enabled": true
+    },
+    {
+      "step_id": "saturation",
+      "order": 4,
+      "display_name": "Saturation / Tape",
+      "type": "saturation",
+      "params": {
+        "drive_pct_range": [10, 20],
+        "tape_speed_ips": 15,
+        "type_options": ["tape", "tube", "transformer"]
+      },
+      "purpose": "Harmonische Anreicherung, Wärme, analoger Charakter.",
+      "optional": true,
+      "default_enabled": true
+    },
+    {
+      "step_id": "creative_eq",
+      "order": 5,
+      "display_name": "Kreativer EQ",
+      "type": "eq",
+      "params": {
+        "approach": "additive",
+        "shelving_moves": [
+          { "freq_hz": 12000, "gain_db": 1, "filter_type": "high_shelf", "purpose": "Air, Luftigkeit" },
+          { "freq_hz": 100, "gain_db": 0.5, "filter_type": "low_shelf", "purpose": "Bass-Wärme" }
+        ]
+      },
+      "purpose": "Tonale Charakter-Akzente.",
+      "optional": true,
+      "default_enabled": true
+    },
+    {
+      "step_id": "multiband_compressor",
+      "order": 6,
+      "display_name": "Multiband-Kompressor",
+      "type": "multiband_compressor",
+      "params": {
+        "bands": [
+          { "name": "bass", "range_hz": [20, 120], "ratio": "2:1", "threshold_db": -15 },
+          { "name": "mids", "range_hz": [120, 5000], "ratio": "1.5:1" },
+          { "name": "highs", "range_hz": [5000, 20000], "ratio": "2:1", "purpose": "Harshness zähmen" }
+        ]
+      },
+      "purpose": "Frequenzbereich-spezifische Dynamik-Kontrolle.",
+      "optional": true,
+      "default_enabled": false,
+      "warning": "Auf Ambient/Klassik vorsichtig — kann atmosphärische Dichte zerstören."
+    },
+    {
+      "step_id": "stereo_widener",
+      "order": 7,
+      "display_name": "Stereo-Imager",
+      "type": "stereo",
+      "params": {
+        "width_pct": 110,
+        "preserve_mono_below_hz": 150,
+        "stereo_above_hz": 200
+      },
+      "purpose": "Stereo-Breite oberhalb Bass; Bass bleibt mono für Phasentreue.",
+      "optional": true,
+      "default_enabled": false,
+      "warning": "Mono-Kompatibilität immer prüfen — Phasen-Auslöschung möglich."
+    },
+    {
+      "step_id": "limiter",
+      "order": 8,
+      "display_name": "Brick-Wall Limiter",
+      "type": "limiter",
+      "params": {
+        "ceiling_db": -1,
+        "release": "auto",
+        "oversampling_factor": 4,
+        "true_peak_aware": true
+      },
+      "purpose": "Endgültige Lautheit + True-Peak-Kontrolle.",
+      "optional": false
+    },
+    {
+      "step_id": "metering",
+      "order": 9,
+      "display_name": "Metering & Verifikation",
+      "type": "metering",
+      "params": {
+        "metrics": ["lufs_integrated", "lufs_short_term", "true_peak", "dynamic_range_dr"],
+        "tools": ["youlean_loudness_meter", "izotope_insight_2", "waves_wlm_plus"]
+      },
+      "purpose": "Mess gegen Plattform-Targets vor Final-Export.",
+      "optional": false
+    }
+  ],
+
+  "genres": {
+    "techno": {
+      "display_name": "Electronic / Techno",
+      "description": "Maximum Loudness + tight, klarer Bass für Club/DJ-Wiedergabe.",
+      "natural_target_lufs": -8,
+      "characteristic_focus": ["punch", "loudness", "club_bass"],
+      "priority_steps": ["multiband_compressor", "saturation", "limiter"],
+      "chain_overrides": {
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "bass_solo_compression": { "range_hz": [30, 120], "ratio": "3:1" },
+            "rest_minimal_touch": true
+          },
+          "reason": "Bass tight halten, Rest atmen lassen."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -0.3 }
+        }
+      },
+      "warnings": [],
+      "reference_artists": []
+    },
+    "psy_ambient": {
+      "display_name": "Psychedelic / Ambient (Shpongle-Style)",
+      "description": "Dynamik erhalten + räumliche Atmosphäre bewahren.",
+      "natural_target_lufs": -12,
+      "characteristic_focus": ["dynamics", "stereo_space", "atmosphere"],
+      "priority_steps": ["compressor", "stereo_widener"],
+      "chain_overrides": {
+        "compressor": {
+          "params": {
+            "ratio_range": [1.0, 1.2],
+            "gain_reduction_db_max": 1
+          },
+          "reason": "Sehr subtle — Dynamik-Tod vermeiden."
+        },
+        "multiband_compressor": {
+          "enabled": false,
+          "reason": "Zerstört atmosphärische Dichte."
+        },
+        "stereo_widener": {
+          "enabled": true,
+          "params": {
+            "width_pct": 115,
+            "preserve_mono_below_hz": 200
+          }
+        }
+      },
+      "warnings": [],
+      "reference_artists": ["Shpongle", "Ott", "Younger Brother", "Entheogenic"]
+    },
+    "classical_acoustic": {
+      "display_name": "Klassik / Acoustic",
+      "description": "Natürliche Dynamik + Raum erhalten. Mikro-Dynamik ist heilig.",
+      "natural_target_lufs": -18,
+      "characteristic_focus": ["natural_dynamics", "linear_phase", "transient_integrity"],
+      "priority_steps": ["corrective_eq", "limiter"],
+      "chain_overrides": {
+        "corrective_eq": {
+          "params": { "linear_phase": true },
+          "reason": "Phasentreue für Transienten und natürliche Klangbilder."
+        },
+        "compressor": {
+          "enabled": false,
+          "reason": "Akustische Dynamik nicht antasten."
+        },
+        "saturation": {
+          "enabled": false,
+          "reason": "Verfärbt natürliche Klangcharakteristik."
+        },
+        "multiband_compressor": { "enabled": false },
+        "stereo_widener": {
+          "enabled": false,
+          "reason": "Original-Stereo-Bild des Aufnahme-Raums respektieren."
+        },
+        "creative_eq": {
+          "enabled": false,
+          "reason": "Tonale Eingriffe sollen aus Mix kommen, nicht aus Master."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -1, "gain_reduction_db_max": 0.3 },
+          "reason": "Mehr Dynamik-Reserve, Schutz-Limiter statt Loudness-Limiter."
+        }
+      },
+      "metering_targets": { "dynamic_range_dr_min": 12 },
+      "warnings": ["Kompression auf akustischem Material zerstört Mikro-Dynamik."],
+      "reference_artists": []
+    },
+    "pop_rock": {
+      "display_name": "Pop / Rock",
+      "description": "Mainstream-Standard mit Vocal-Klarheit, Bass-Punch und kompetitiver Lautheit.",
+      "natural_target_lufs": -10,
+      "characteristic_focus": ["vocal_presence", "punch", "clarity"],
+      "priority_steps": ["compressor", "creative_eq", "limiter"],
+      "chain_overrides": {},
+      "warnings": [],
+      "reference_artists": []
+    },
+    "hiphop_trap": {
+      "display_name": "Hip-Hop / Trap",
+      "description": "Tiefe 808s, klare Vocals, kompetitive Lautheit.",
+      "natural_target_lufs": -8,
+      "characteristic_focus": ["sub_bass", "vocal_clarity", "loudness"],
+      "priority_steps": ["multiband_compressor", "saturation", "limiter"],
+      "chain_overrides": {
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "sub_band": { "range_hz": [20, 80], "ratio": "2:1", "purpose": "808 tight halten" }
+          }
+        },
+        "creative_eq": {
+          "params": {
+            "vocal_air_boost": { "freq_hz": 10000, "gain_db": 1.5, "filter_type": "high_shelf" }
+          }
+        }
+      },
+      "warnings": ["Sub-Bass-Mono-Check kritisch — viele 808s sind stereo aufgenommen, brauchen Mono-Fold."],
+      "reference_artists": []
+    },
+    "drum_and_bass": {
+      "display_name": "Drum & Bass / Liquid",
+      "description": "Hohe Energie, präziser Sub-Bass, schnelle Transienten.",
+      "natural_target_lufs": -7,
+      "characteristic_focus": ["transient_punch", "sub_bass_definition", "loudness"],
+      "priority_steps": ["multiband_compressor", "saturation", "limiter"],
+      "chain_overrides": {
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "sub_band": { "range_hz": [20, 100], "ratio": "3:1" },
+            "transient_preservation": true
+          }
+        },
+        "limiter": {
+          "params": { "ceiling_db": -0.3, "release": "fast" }
+        }
+      },
+      "warnings": ["Transienten-Erhaltung wichtiger als reine Lautheit — Limiter mit fast Release."],
+      "reference_artists": []
+    },
+    "breakbeat": {
+      "display_name": "Breakbeat / Big Beat",
+      "description": "Sample-getriebene, vintage-charakterisierte Drums (~115-140 BPM), Breakdown-Dramaturgie, oft Funk-/Soul-Sample-Quellen.",
+      "natural_target_lufs": -8,
+      "characteristic_focus": ["drum_punch", "sample_warmth", "breakdown_contrast", "vintage_character"],
+      "priority_steps": ["saturation", "multiband_compressor", "limiter"],
+      "chain_overrides": {
+        "saturation": {
+          "enabled": true,
+          "params": {
+            "drive_pct_range": [15, 25],
+            "tape_speed_ips": 15,
+            "type_options": ["tape", "tube"]
+          },
+          "reason": "Drum-Samples sollen analoge Sättigung tragen — Tape-Charakter ist Genre-Signatur."
+        },
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "transient_preservation": true,
+            "bass_band": { "range_hz": [40, 120], "ratio": "2:1" }
+          },
+          "reason": "Bass tight halten, Drum-Transienten frei lassen für Punch."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -0.3, "release": "auto" }
+        }
+      },
+      "warnings": ["Sample-Material kann clippen — vor Master prüfen, ggf. Saturation reduzieren."],
+      "reference_artists": ["The Prodigy", "Chemical Brothers", "Fatboy Slim", "Propellerheads"]
+    },
+    "britcore": {
+      "display_name": "Britcore / UK Hardcore Breakbeat",
+      "description": "Aggressive, dichte UK-Breakbeat-Hardcore-Variante (~160-180 BPM), Sample-lastig, dunkel, kompromisslose Lautheit.",
+      "natural_target_lufs": -7,
+      "characteristic_focus": ["aggression", "transient_sharpness", "sample_density", "darkness"],
+      "priority_steps": ["multiband_compressor", "saturation", "limiter"],
+      "chain_overrides": {
+        "saturation": {
+          "enabled": true,
+          "params": {
+            "drive_pct_range": [20, 35],
+            "type_options": ["tape", "tube", "transformer"]
+          },
+          "reason": "Aggressiver Charakter braucht harte harmonische Sättigung."
+        },
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "bass_band": { "range_hz": [40, 150], "ratio": "3:1" },
+            "highs_band": { "range_hz": [5000, 20000], "ratio": "2.5:1", "purpose": "Sample-Harshness halbwegs zähmen ohne Energie zu nehmen" }
+          },
+          "reason": "Sample-Energie muss durch, aber im Master nicht zerreißen."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -0.3, "release": "fast", "gain_reduction_db_max": 4 },
+          "reason": "Breakbeat-Energie an Streaming-Cap pressen, Transienten dürfen leiden."
+        }
+      },
+      "warnings": ["Streaming-Normalisierung regelt das deutlich runter (typisch 6-7 dB Verlust gegenüber Genre-Natural)."],
+      "reference_artists": []
+    },
+    "trip_hop": {
+      "display_name": "Trip-Hop",
+      "description": "Langsam (~85-100 BPM), atmosphärisch, vinyl-warm, sparsam aber dicht geschichtet. Dynamik-Erhalt ist Genre-Pflicht.",
+      "natural_target_lufs": -12,
+      "characteristic_focus": ["vintage_warmth", "vocal_intimacy", "drum_punch_in_space", "mid_bass_weight"],
+      "priority_steps": ["saturation", "compressor", "creative_eq"],
+      "chain_overrides": {
+        "compressor": {
+          "params": {
+            "ratio_range": [1.2, 1.5],
+            "attack_ms_range": [40, 60],
+            "release_ms_range": [300, 500],
+            "gain_reduction_db_max": 1.5
+          },
+          "reason": "Sehr subtle — Dynamik und Atmen erhalten, kein Pumpen."
+        },
+        "saturation": {
+          "enabled": true,
+          "params": {
+            "drive_pct_range": [15, 30],
+            "tape_speed_ips": 7.5,
+            "type_options": ["tape", "tube"]
+          },
+          "reason": "Vinyl-/Tape-Charakter ist Genre-Identität (langsame Tape-Speed = mehr Sättigung)."
+        },
+        "creative_eq": {
+          "params": {
+            "shelving_moves": [
+              { "freq_hz": 80, "gain_db": 1, "filter_type": "low_shelf", "purpose": "Mid-Bass-Weight, Vinyl-Bass-Gefühl" },
+              { "freq_hz": 10000, "gain_db": -0.5, "filter_type": "high_shelf", "purpose": "Höhen leicht zähmen, Vintage-Färbung" }
+            ]
+          }
+        },
+        "multiband_compressor": {
+          "enabled": false,
+          "reason": "Würde Dichte und Atmen zerstören — Drums leben von der Drum-Bus-Kompression im Mix."
+        },
+        "stereo_widener": {
+          "enabled": false,
+          "reason": "Trip-Hop ist mid-zentriert. Stereo-Bild kommt aus Pads + Ambient-Ebenen, nicht aus Master-Widening."
+        }
+      },
+      "warnings": ["LUFS bewusst unter Spotify-Target — Genre-Charakter wichtiger als Lautheits-Konkurrenz."],
+      "reference_artists": ["Massive Attack", "Portishead", "Tricky", "DJ Shadow", "RJD2", "Bonobo"]
+    },
+    "rap": {
+      "display_name": "Rap (Vocal-zentriert)",
+      "description": "Vocal-Klarheit über allem. Beat-Punch unterstützend, nicht dominierend. Modernes Loudness-Niveau.",
+      "natural_target_lufs": -8,
+      "characteristic_focus": ["vocal_clarity", "vocal_intelligibility", "beat_punch", "de_essing"],
+      "priority_steps": ["multiband_compressor", "compressor", "limiter"],
+      "chain_overrides": {
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "vocal_band": { "range_hz": [2000, 6000], "ratio": "2.5:1", "purpose": "Vocal-Mids tight halten" },
+            "sibilance_band": { "range_hz": [6000, 9000], "ratio": "3:1", "purpose": "De-Essing-Ersatz im Master" }
+          },
+          "reason": "Vocal-Frequenzbereich gezielt komprimieren, ohne den ganzen Master zu erdrücken."
+        },
+        "compressor": {
+          "params": {
+            "ratio_range": [1.5, 2.0],
+            "gain_reduction_db_max": 1.5
+          }
+        }
+      },
+      "warnings": [
+        "De-Essing am Master ist Notlösung — eigentlich gehört's auf den Vocal-Bus im Mix.",
+        "Aggressive Multiband-Settings können Plosive verstärken — vor Master-Lock prüfen."
+      ],
+      "reference_artists": []
+    },
+    "progressive_trance": {
+      "display_name": "Progressive Trance",
+      "description": "Melodisch-bauend, ~134-138 BPM, lange Build-Ups, Vollspektrum-Stereo, Lead-Synth-zentriert.",
+      "natural_target_lufs": -8,
+      "characteristic_focus": ["stereo_width", "sub_bass_tightness", "lead_clarity", "build_dynamics"],
+      "priority_steps": ["multiband_compressor", "stereo_widener", "limiter"],
+      "chain_overrides": {
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "sub_band": { "range_hz": [30, 100], "ratio": "2.5:1", "purpose": "Sub tight, Bass-Punch erhalten" },
+            "transient_preservation": true
+          }
+        },
+        "stereo_widener": {
+          "enabled": true,
+          "params": {
+            "width_pct": 115,
+            "preserve_mono_below_hz": 150,
+            "stereo_above_hz": 200
+          },
+          "reason": "Pads + Leads brauchen Breite, Bass strikt mono."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -0.5, "release": "auto" }
+        }
+      },
+      "warnings": ["Build-Up-Dynamik erhalten — Limiter darf Crescendo nicht plätten."],
+      "reference_artists": ["Above & Beyond", "Andrew Bayer", "Kyau & Albert", "Cosmic Gate", "Ferry Corsten"]
+    },
+    "psytrance": {
+      "display_name": "Psy-Trance",
+      "description": "Driving 16th-note Bass (~140-148 BPM), komplexe Synthese, Voll-Frequenzgang. Sub-Bass-Mono kritisch.",
+      "natural_target_lufs": -8,
+      "characteristic_focus": ["sub_bass_tightness", "transient_impact", "stereo_width_synths", "mono_bass"],
+      "priority_steps": ["multiband_compressor", "stereo_widener", "limiter"],
+      "chain_overrides": {
+        "multiband_compressor": {
+          "enabled": true,
+          "params": {
+            "sub_band": { "range_hz": [40, 100], "ratio": "3.5:1", "purpose": "16th-note Bass-Pattern muss stehen" },
+            "kick_protection": true
+          },
+          "reason": "Sub-/Kick-Layering ist Psy-Signatur — beide separat kontrollieren."
+        },
+        "stereo_widener": {
+          "enabled": true,
+          "params": {
+            "width_pct": 120,
+            "preserve_mono_below_hz": 200,
+            "stereo_above_hz": 250
+          },
+          "reason": "Lead-/FX-Synths weit, Bass strikt mono unter 200 Hz (Sub-Bass-Phasentreue ist heilig)."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -0.3, "release": "fast" }
+        }
+      },
+      "warnings": [
+        "Sub-Bass-Mono unter 200 Hz IMMER prüfen — Phasen-Cancel auf Sound-Systems killt den ganzen Track.",
+        "Limiter darf 16th-note-Pattern nicht zerquetschen — fast Release essentiell."
+      ],
+      "reference_artists": ["Astrix", "Vini Vici", "Infected Mushroom", "GMS", "1200 Micrograms", "Ace Ventura"]
+    },
+    "dub_techno": {
+      "display_name": "Dub Techno",
+      "description": "Sub-Bass-fokussiert (~115-125 BPM), sparsam, weite Reverb-Räume, minimalistische Elemente, Tape-/Vinyl-Charakter.",
+      "natural_target_lufs": -10,
+      "characteristic_focus": ["sub_bass_weight", "reverb_tail_clarity", "atmospheric_space", "sparse_dynamics"],
+      "priority_steps": ["saturation", "compressor", "limiter"],
+      "chain_overrides": {
+        "compressor": {
+          "params": {
+            "ratio_range": [1.2, 1.5],
+            "attack_ms_range": [40, 60],
+            "release_ms_range": [400, 600],
+            "gain_reduction_db_max": 1.5
+          },
+          "reason": "Sehr subtle — sparse Dynamik und Reverb-Tails atmen lassen."
+        },
+        "saturation": {
+          "enabled": true,
+          "params": {
+            "drive_pct_range": [10, 20],
+            "tape_speed_ips": 7.5,
+            "type_options": ["tape"]
+          },
+          "reason": "Tape-Charakter ist Genre-Signatur (Basic-Channel-Sound)."
+        },
+        "multiband_compressor": {
+          "enabled": false,
+          "reason": "Würde Reverb-Räume zerstückeln und sparse Atmosphäre zerstören."
+        },
+        "stereo_widener": {
+          "enabled": false,
+          "reason": "Stereo-Bild kommt aus Reverb-Routing, nicht aus Widening."
+        },
+        "limiter": {
+          "params": { "ceiling_db": -1, "release": "auto", "gain_reduction_db_max": 1 },
+          "reason": "Schutz-Limiter, nicht Loudness-Limiter — Dynamik ist Genre-Pflicht."
+        }
+      },
+      "warnings": ["Quiet by design — Streaming-Normalisierung regelt nicht hoch, das ist OK."],
+      "reference_artists": ["Basic Channel", "Rhythm & Sound", "Deepchord", "Yagya", "Echospace", "Vladislav Delay"]
+    }
+  },
+
+  "deliverable_formats": {
+    "streaming_24bit": {
+      "display_name": "Streaming Master (24-bit)",
+      "format": "wav",
+      "bit_depth": 24,
+      "sample_rate_hz": 44100,
+      "dither": "none",
+      "notes": "Plattform-Codecs konvertieren intern. 24-bit von allen großen Streamern akzeptiert."
+    },
+    "streaming_16bit": {
+      "display_name": "Streaming Master (16-bit, Legacy-kompatibel)",
+      "format": "wav",
+      "bit_depth": 16,
+      "sample_rate_hz": 44100,
+      "dither": "pow_r_2",
+      "notes": "Falls 24-bit von Distributor nicht akzeptiert."
+    },
+    "cd_redbook": {
+      "display_name": "CD (Red Book)",
+      "format": "wav",
+      "bit_depth": 16,
+      "sample_rate_hz": 44100,
+      "dither": "pow_r_2_or_apogee_uv22hr",
+      "notes": "PQ-Codes, 2 s Pause zwischen Tracks, ISRC-Codes. DDP-Master via Sonoris/Wavelab statt Audio-CDs brennen."
+    },
+    "vinyl_pre_master": {
+      "display_name": "Vinyl Pre-Master (an Cutting-Engineer)",
+      "format": "wav",
+      "bit_depth": 24,
+      "sample_rate_hz": 96000,
+      "dither": "none",
+      "notes": "Engineer macht finale Anpassungen — kein Limiting!",
+      "additional_constraints": {
+        "bass_mono_below_hz": 150,
+        "stereo_max_pct": 110,
+        "groove_spacing_consideration": true
+      }
+    },
+    "club_master_dj": {
+      "display_name": "Club-/DJ-Master",
+      "format": "wav",
+      "bit_depth": 24,
+      "sample_rate_hz": 44100,
+      "dither": "none",
+      "notes": "32-Takt-Intro/Outro für DJ-Mixing. -8 LUFS, +2 dB @ 60-100 Hz."
+    }
+  }
+}

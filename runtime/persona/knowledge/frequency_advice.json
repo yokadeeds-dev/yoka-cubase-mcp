@@ -1,0 +1,233 @@
+{
+  "version": "0.1",
+  "last_updated": "2026-05-06",
+  "source_doc": "YMP/Studium/35_EQ_Frequency_Management.md",
+  "notes": "Sprint B Erst-Ausarbeitung basierend auf YMP Doc 35. Pro Track-Rolle: Frequenz-Bereiche, Cut/Boost-Empfehlungen, typische Problemzonen, masking-Konflikte mit anderen Rollen. Genre-Modifier optional. Yoka erweitert fachlich.",
+
+  "frequency_bands": {
+    "sub_bass": { "range_hz": [20, 60], "description": "Fundamentale Energie, körperliches Gefühl, Kick-Drum-Fundament", "risks": "Matsch, Unklarheit" },
+    "bass": { "range_hz": [60, 250], "description": "Wärme und Power, Basslinien, Bassdrums", "problem_zone_hz": [200, 250], "problem_label": "Boxiness" },
+    "low_mids": { "range_hz": [250, 500], "description": "Körper und Fülle, Gitarren, Vocals, Snares", "problem_label": "Muddy-Bereich" },
+    "mids": { "range_hz": [500, 2000], "description": "Präsenz und Klarheit, Vocals, Lead-Instrumente", "reference_hz": 1000, "reference_label": "Telefon-Frequenz" },
+    "high_mids": { "range_hz": [2000, 6000], "description": "Brillanz und Definition, Konsonanten, Attack", "sibilance_hz_range": [4000, 8000] },
+    "treble": { "range_hz": [6000, 15000], "description": "Air und Sparkle, Becken, Hi-Hats" },
+    "air": { "range_hz": [15000, 20000], "description": "Air Band, Spatial Information" }
+  },
+
+  "track_roles": {
+    "kick": {
+      "display_name": "Kick Drum",
+      "core_zones": [
+        { "purpose": "Sub-Fundament", "freq_hz": [40, 50], "action": "boost", "amount_db_range": [1, 3], "q": "tight", "notes": "Tight Q damit nicht in Bass-Range übergreift" },
+        { "purpose": "Punch", "freq_hz": [60, 80], "action": "boost", "amount_db_range": [1, 3], "q": "moderate", "notes": "Trip-Hop / Hip-Hop oft hier Schwerpunkt" },
+        { "purpose": "Click / Beater", "freq_hz": [3000, 5000], "action": "boost", "amount_db_range": [1, 3], "q": "moderate", "notes": "Definition für Mix-Durchsetzung" }
+      ],
+      "problem_zones": [
+        { "freq_hz": 400, "issue": "Boxiness", "action": "cut", "amount_db_range": [-3, -1], "q": "moderate" }
+      ],
+      "high_pass_hz": null,
+      "masking_conflicts": ["bass", "synth_lead"]
+    },
+    "snare": {
+      "display_name": "Snare",
+      "core_zones": [
+        { "purpose": "Body", "freq_hz": 200, "action": "boost", "amount_db_range": [1, 3], "q": "moderate" },
+        { "purpose": "Crack / Snap", "freq_hz": [3000, 5000], "action": "boost", "amount_db_range": [2, 4], "q": "moderate" }
+      ],
+      "problem_zones": [
+        { "freq_hz": 200, "issue": "Mud (kontextabhängig — gleiche Freq wie Body)", "action": "depends" },
+        { "freq_hz": 1000, "issue": "Ringy", "action": "cut", "amount_db_range": [-3, -1], "q": "narrow" }
+      ],
+      "high_pass_hz": 100,
+      "masking_conflicts": ["e_guitar_distorted", "vocal_lead"]
+    },
+    "drums_group": {
+      "display_name": "Drum Bus / Drum Group",
+      "core_zones": [
+        { "purpose": "Punch erhalten", "freq_hz": 100, "action": "depends", "notes": "Bus-EQ subtle, max ±2 dB" }
+      ],
+      "problem_zones": [],
+      "high_pass_hz": 35,
+      "masking_conflicts": ["bass"]
+    },
+    "tom": {
+      "display_name": "Tom",
+      "core_zones": [
+        { "purpose": "Body", "freq_hz": [80, 200], "action": "boost", "amount_db_range": [1, 3], "q": "moderate" },
+        { "purpose": "Attack", "freq_hz": [3000, 5000], "action": "boost", "amount_db_range": [1, 2], "q": "moderate" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 400], "issue": "Resonanzen", "action": "cut", "amount_db_range": [-4, -2], "q": "narrow", "notes": "Sweep-Technik um exakte Resonanz zu finden" }
+      ],
+      "high_pass_hz": 60,
+      "masking_conflicts": ["bass"]
+    },
+    "hihat": {
+      "display_name": "Hi-Hat",
+      "core_zones": [
+        { "purpose": "Sizzle", "freq_hz": [8000, 15000], "action": "boost", "amount_db_range": [1, 3], "q": "shelf" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [8000, 10000], "issue": "Harshness", "action": "cut_if_needed", "amount_db_range": [-2, -1], "q": "moderate" }
+      ],
+      "high_pass_hz": 500,
+      "masking_conflicts": ["vocal_sibilance"]
+    },
+    "bass": {
+      "display_name": "Bass (E-Bass oder Synth-Bass)",
+      "core_zones": [
+        { "purpose": "Sub", "freq_hz": [40, 60], "action": "boost_or_keep", "amount_db_range": [0, 2], "q": "shelf" },
+        { "purpose": "Body / Low-Punch", "freq_hz": [100, 200], "action": "boost", "amount_db_range": [1, 3], "q": "moderate" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 300], "issue": "Mud, oft mit Gitarren überlappend", "action": "cut", "amount_db_range": [-3, -1], "q": "moderate" }
+      ],
+      "high_pass_hz": 30,
+      "masking_conflicts": ["kick", "low_synths", "e_guitar"],
+      "complementary_eq_hint": "Wenn Kick @60-80Hz boost, dann Bass @60-80Hz gentle dip — Frequency-Niche-Prinzip"
+    },
+    "808_sub": {
+      "display_name": "808 / Sub-Bass-Layer",
+      "core_zones": [
+        { "purpose": "Tight Sub", "freq_hz": [40, 60], "action": "boost", "amount_db_range": [2, 4], "q": "tight" },
+        { "purpose": "Harmonics", "freq_hz": [100, 150], "action": "keep_or_boost", "amount_db_range": [0, 2] }
+      ],
+      "problem_zones": [
+        { "freq_hz": 200, "issue": "Boxiness, oft High-Pass nötig", "action": "high_pass" }
+      ],
+      "high_pass_hz": 30,
+      "masking_conflicts": ["kick", "bass"],
+      "notes": "Mono-Pflicht unter 150 Hz. Stereo-808 brauchen Mono-Fold-Check."
+    },
+    "vocal_lead": {
+      "display_name": "Vocal Lead",
+      "core_zones": [
+        { "purpose": "Warmth / Body", "freq_hz": [100, 250], "action": "boost", "amount_db_range": [1, 3], "q": "shelf" },
+        { "purpose": "Präsenz / Forward", "freq_hz": [3000, 5000], "action": "boost", "amount_db_range": [2, 4], "q": "moderate" },
+        { "purpose": "Air / Sparkle", "freq_hz": [10000, 12000], "action": "boost", "amount_db_range": [1, 3], "q": "shelf" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 300], "issue": "Boxiness", "action": "cut", "amount_db_range": [-3, -1] },
+        { "freq_hz": [400, 600], "issue": "Nasalität", "action": "cut_narrow", "amount_db_range": [-3, -2], "q": "narrow" },
+        { "freq_hz": [1000, 2000], "issue": "Harshness", "action": "cut_if_needed", "amount_db_range": [-2, -1] },
+        { "freq_hz": [4000, 8000], "issue": "Sibilanz", "action": "de_esser", "notes": "De-Esser statt EQ-Cut" }
+      ],
+      "high_pass_hz": 100,
+      "masking_conflicts": ["e_guitar", "synth_lead", "snare_crack"]
+    },
+    "vocal_backing": {
+      "display_name": "Backing Vocals",
+      "core_zones": [
+        { "purpose": "Body", "freq_hz": [200, 300], "action": "keep", "notes": "Subtler als Lead" },
+        { "purpose": "Air", "freq_hz": [10000, 12000], "action": "boost", "amount_db_range": [1, 2], "q": "shelf" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [3000, 5000], "issue": "Konkurrenz mit Lead-Vocal", "action": "cut", "amount_db_range": [-2, -1], "q": "moderate", "notes": "Complementary EQ: wo Lead boost, hier dip" }
+      ],
+      "high_pass_hz": 120,
+      "masking_conflicts": ["vocal_lead"],
+      "complementary_eq_hint": "Wo Lead-Vocal Präsenz boostet, hier sanft dippen. Lead bleibt vorne, Backing schiebt sich nach hinten."
+    },
+    "acoustic_guitar": {
+      "display_name": "Akustik-Gitarre",
+      "core_zones": [
+        { "purpose": "Body", "freq_hz": [100, 200], "action": "keep_or_boost", "amount_db_range": [0, 2] },
+        { "purpose": "Strings / Definition", "freq_hz": [2000, 5000], "action": "boost", "amount_db_range": [1, 3], "q": "moderate" },
+        { "purpose": "Air", "freq_hz": [10000, 12000], "action": "boost", "amount_db_range": [1, 2], "q": "shelf" }
+      ],
+      "problem_zones": [
+        { "freq_hz": 200, "issue": "Dumpfheit / Mud", "action": "cut", "amount_db_range": [-3, -1] },
+        { "freq_hz": 800, "issue": "Honk", "action": "cut_narrow", "amount_db_range": [-3, -2], "q": "narrow" },
+        { "freq_hz": 3000, "issue": "Harshness (kontextabhängig — manchmal gewollt)", "action": "depends" }
+      ],
+      "high_pass_hz": 80,
+      "masking_conflicts": ["vocal_lead", "synth_pads"]
+    },
+    "e_guitar": {
+      "display_name": "Elektrische Gitarre (clean/distorted)",
+      "core_zones": [
+        { "purpose": "Body", "freq_hz": [200, 400], "action": "depends", "notes": "Auch Mud-Zone — Genre-abhängig" },
+        { "purpose": "Präsenz", "freq_hz": [1000, 3000], "action": "boost", "amount_db_range": [1, 3] }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 400], "issue": "Mud", "action": "cut", "amount_db_range": [-3, -1] },
+        { "freq_hz": [2000, 3000], "issue": "Ice-Pick", "action": "cut_if_needed", "amount_db_range": [-2, -1], "q": "narrow" },
+        { "freq_hz": 5000, "issue": "Schärfe", "action": "cut_if_needed", "amount_db_range": [-2, -1] }
+      ],
+      "high_pass_hz": 80,
+      "masking_conflicts": ["vocal_lead", "snare", "bass"]
+    },
+    "synth_lead": {
+      "display_name": "Synth Lead",
+      "core_zones": [
+        { "purpose": "Charakter-Frequenz", "freq_hz": "depends", "action": "depends", "notes": "Stark Sound-Design-abhängig" },
+        { "purpose": "Definition", "freq_hz": [2000, 5000], "action": "depends" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [60, 150], "issue": "Konkurrenz mit Bass", "action": "high_pass", "notes": "Platz für Bass schaffen" }
+      ],
+      "high_pass_hz": 100,
+      "masking_conflicts": ["bass", "vocal_lead"]
+    },
+    "synth_pad": {
+      "display_name": "Synth Pad / Texture",
+      "core_zones": [
+        { "purpose": "Wärme", "freq_hz": [100, 250], "action": "depends", "notes": "Pads atmen oft im Tiefen-Body" },
+        { "purpose": "Air", "freq_hz": [8000, 15000], "action": "boost", "amount_db_range": [0, 2], "q": "shelf" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 500], "issue": "Konkurrenz mit Vocal-Body", "action": "cut", "amount_db_range": [-3, -1] }
+      ],
+      "high_pass_hz": 80,
+      "masking_conflicts": ["vocal_lead", "acoustic_guitar"]
+    },
+    "harmonic_other": {
+      "display_name": "Harmonic / Other (general purpose)",
+      "core_zones": [
+        { "purpose": "Body", "freq_hz": [80, 250], "action": "keep" },
+        { "purpose": "Definition", "freq_hz": [2000, 5000], "action": "keep" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 400], "issue": "Mud — Standard-Cut-Kandidat", "action": "cut_if_muddy", "amount_db_range": [-2, -1] }
+      ],
+      "high_pass_hz": 80,
+      "masking_conflicts": []
+    },
+    "master_bus": {
+      "display_name": "Master Bus",
+      "core_zones": [
+        { "purpose": "Air-Shelf", "freq_hz": [10000, 12000], "action": "boost_subtle", "amount_db_range": [0.5, 1.5], "q": "shelf" },
+        { "purpose": "Warmth-Shelf", "freq_hz": [80, 100], "action": "boost_subtle", "amount_db_range": [0.3, 1.0], "q": "shelf" }
+      ],
+      "problem_zones": [
+        { "freq_hz": [200, 300], "issue": "Mid-Mud (mix-bedingt)", "action": "cut_subtle", "amount_db_range": [-1.5, -0.5] },
+        { "freq_hz": 8000, "issue": "Harshness (bei lauten Master)", "action": "cut_subtle", "amount_db_range": [-1.5, -0.5] }
+      ],
+      "high_pass_hz": 30,
+      "masking_conflicts": [],
+      "notes": "Master-EQ subtle — max ±2 dB Eingriffe. Linear Phase oft besser am Master."
+    }
+  },
+
+  "masking_resolution_strategies": {
+    "complementary_eq": "Wenn Track A bei Frequenz X boost, Track B bei gleicher Frequenz dip (-2 dB). Schafft Klarheit + Separation.",
+    "frequency_niche": "Jedes Element bekommt eigenen Bereich: Kick 60Hz+3-5kHz, Bass 40-50Hz+100-200Hz, Snare 200Hz+3-4kHz, Vocal 1-3kHz+5-8kHz",
+    "dynamic_eq_for_masking": "Bass mit Dynamic Cut @60Hz nur aktiv wenn Kick spielt. Maximale Klarheit, beide bleiben tight.",
+    "sidechain_compression": "Kick triggers Compressor auf Bass — typisch -2 bis -4 dB Reduction nur während Kick-Hits."
+  },
+
+  "critical_listening_rules": {
+    "solo_vs_context": "NIEMALS finale EQ-Entscheidungen im Solo treffen. Solo nur für Problemfrequenzen identifizieren. Mix-Kontext ist Pflicht für finale Wahl.",
+    "reference_loudness_db_spl": [70, 75],
+    "reference_loudness_note": "Hauptarbeit bei 70-75 dB SPL (Fletcher-Munson-Linearität). Laut nur für Emotion/Vibe-Check, leise für Balance.",
+    "fletcher_munson_warning": "Bei >85 dB SPL hört man mehr Bass + mehr Höhen → man EQt zu wenig. Bei ruhiger Lautstärke linearer + bessere Entscheidungen."
+  },
+
+  "sweep_technique_for_problem_freqs": {
+    "step_1": "Schmalbandiger Boost (+12 dB, Q=10)",
+    "step_2": "Frequenz durchsweepen während Track läuft",
+    "step_3": "Unangenehme Stellen identifizieren (Resonanz, Harshness, Boxiness)",
+    "step_4": "Dort schmalbandiger Cut (-3 bis -6 dB) anwenden",
+    "principle": "Mehrere kleine Cuts besser als ein großer breiter."
+  }
+}
