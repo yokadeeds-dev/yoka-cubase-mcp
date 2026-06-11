@@ -1,6 +1,6 @@
 # Sponsoren
 
-`yoka-cubase-mcp` ist freie Software (MIT). Der freie Kern bleibt für immer frei nutzbar.
+`yoka-cubase-mcp` ist freie Software (**AGPL-3.0**, dual-lizenziert — siehe [`LICENSING.md`](LICENSING.md)). Der freie Kern bleibt für immer frei nutzbar.
 
 Das **Premium-Add-On** [`yoka-cubase-premium`](https://github.com/yokadeeds-dev/yoka-cubase-premium) — mit der Mixing-/Mastering-Wissensbasis, der vollen Command-Belegung und der vollen Stock-Plugin-Abdeckung — entsteht in unbezahlter Eigenarbeit. Wer es nutzt, hält die Entwicklung am Laufen.
 

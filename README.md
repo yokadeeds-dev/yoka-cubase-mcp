@@ -90,7 +90,7 @@ Der Server erkennt das Add-On automatisch (`_premium_in_same_runtime()`). Ohne A
 
 ```
 yoka-cubase-mcp/
-├── README.md · LICENSE (MIT) · requirements.txt
+├── README.md · LICENSE (AGPL-3.0) · LICENSING.md · CONTRIBUTING.md · requirements.txt
 ├── runtime/
 │   ├── mackie/        ← MCU-Kern: parser, state, listener, sender, closedloop, units
 │   ├── ahk/           ← Hotkey-Bridge-Mechanik (Standard-Commands; volle Patch-Map = Premium)
@@ -160,7 +160,12 @@ Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze d
 
 ## Lizenz
 
-[MIT](LICENSE) © 2026 Yoka. Frei nutzbar, fork- und modifizierbar — nur der Copyright-Hinweis muss erhalten bleiben.
+**Dual-Lizenz** (Details in [`LICENSING.md`](LICENSING.md)):
+
+- **[AGPL-3.0](LICENSE)** für offene Nutzung — Copyleft + Netzwerk-Klausel (§13): wer eine modifizierte Version als Netzwerk-Dienst betreibt, muss den Quellcode offenlegen.
+- **Kommerzielle Lizenz** für proprietäre Einbettung ohne AGPL-Pflichten — auf Anfrage.
+
+© 2026 Yoka. Der Premium-Wissens-Layer ([`yoka-cubase-premium`](https://github.com/yokadeeds-dev/yoka-cubase-premium)) ist separat (privat) lizenziert. Beiträge: siehe [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Credits
 
