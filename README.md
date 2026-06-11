@@ -20,6 +20,12 @@ Drei Bridge-Layer:
 | **AHK** | Hotkey-Bridge für Cubase-**Standard-Commands** (die mit eigenem Hotkey) + Macros | synthetische Keystrokes |
 | **MIDI-Send** | Note-On/Off für Recording + generische Command-/Plugin-Steuer-Mechanik via Cubase MIDI Remote API | MIDI via loopMIDI |
 
+**DAW-Kompatibilität — nach Layer:**
+
+- **Mackie/MCU** (Mode, Track-Select, Volume, Transport, Plugin-Pages, State-Mirror): reines MCU-Protokoll → jede MCU-fähige DAW. **Live verifiziert: Cubase + Ableton Live 12** (Mode-Wechsel, Track-Select, State-Mirror closed-loop bestätigt). Sollte ebenso mit Nuendo, Studio One, Reaper, Bitwig, Logic, FL Studio laufen — ungetestet, Feedback willkommen. Der MCU-Funktionsumfang variiert je nach DAW.
+- **AHK-Hotkey-Bridge** (Standard-Commands, Macros): Hotkeys sind **DAW-spezifisch** — Maps für Cubase + Ableton vorhanden, andere DAWs brauchen eine eigene Map.
+- **Plugin-/Command-Steuerung via MIDI Remote**: **Cubase-spezifisch** (Cubase MIDI Remote API).
+
 **Kerneigenschaften:**
 - **Closed-Loop:** Jede Steuer-Aktion wartet auf das DAW-Echo und meldet `verified: true/false` — kein Hoffen, dass ein Befehl ankam.
 - **State-Mirror:** `get_daw_state` liefert jederzeit Mode, Transport, aktive Spur, 8 sichtbare Strips mit Volume/Mute/Solo/VU — ohne Screenshot.
