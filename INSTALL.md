@@ -54,14 +54,17 @@ fehlschlägt, statt drüberzugehen:
    den Server als "Connected" listet. Ein manueller  python -m runtime.mcp.server  wartet
    bei stdio nur stumm auf Eingabe (kein Output = normal, KEIN Fehler) — Strg+C zum Beenden.
 
-7. DAW-Setup anleiten (GUI-Schritte, die du NICHT für mich automatisieren kannst):
-   - loopMIDI (Windows, https://www.tobias-erichsen.de/software/loopmidi.html) bzw.
-     IAC (macOS: python -m runtime.setup.add_iac_ports) mit den Ports
-     MACKIE_FROM_CUBASE, MACKIE_TO_CUBASE, AI_INPUT.
-   - In Cubase ein Mackie-Control-Device auf diese Ports einrichten — Schritt für
-     Schritt steht das in docs/01_setup_cubase_mcu.md.
-   Führe mich durch diese Schritte und lass mich danach nochmal
-   python -m runtime.setup.doctor  laufen, bis alles grün ist.
+7. DAW-Setup:
+   a) loopMIDI installieren — das kannst du fuer mich uebernehmen:
+      Windows:  winget install -e --id TobiasErichsen.loopMIDI --accept-package-agreements --accept-source-agreements
+                (Falls winget fehlt: manueller Download https://www.tobias-erichsen.de/software/loopmidi.html)
+      macOS:    python -m runtime.setup.add_iac_ports
+   b) Virtuelle Ports anlegen (GUI — das musst DU klicken): Starte loopMIDI und lege drei
+      Ports an, exakt benannt: MACKIE_FROM_CUBASE, MACKIE_TO_CUBASE, AI_INPUT.
+   c) In Cubase ein Mackie-Control-Device auf diese Ports (Eingang MACKIE_TO_CUBASE,
+      Ausgang MACKIE_FROM_CUBASE) — Schritt fuer Schritt in docs/01_setup_cubase_mcu.md.
+   Installiere a) selbst, fuehre mich durch b) und c), und lass mich danach nochmal
+   python -m runtime.setup.doctor  laufen, bis die MIDI-/Cubase-Warnungen weg sind.
 ```
 
 Claude Code zeigt dir jeden Schritt und fragt vor Änderungen nach — du behältst die Kontrolle.
@@ -83,8 +86,10 @@ python -m tests.selftests.listener_selftest             # erwartet: [OK] bestand
 
 Zwei Schritte brauchen GUI-Interaktion bzw. eine externe App:
 
-1. **Virtuelle MIDI-Ports** — loopMIDI (Windows) ist eine separate App; IAC (macOS) wird
-   über `python -m runtime.setup.add_iac_ports` angelegt. Benötigte Ports:
+1. **Virtuelle MIDI-Ports** — die loopMIDI-*Installation* läuft per winget
+   (`winget install -e --id TobiasErichsen.loopMIDI`), das *Anlegen der Ports* in der
+   loopMIDI-GUI ist aber manuell. IAC (macOS) wird über
+   `python -m runtime.setup.add_iac_ports` angelegt. Benötigte Ports:
    `MACKIE_FROM_CUBASE`, `MACKIE_TO_CUBASE`, `AI_INPUT`.
 2. **Mackie-Control-Device in Cubase** — Studio → Studio-Setup → Mackie Control, Input/
    Output auf die loopMIDI/IAC-Ports. Anleitung: [`docs/01_setup_cubase_mcu.md`](docs/01_setup_cubase_mcu.md).

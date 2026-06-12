@@ -1,12 +1,18 @@
-# Setup Cubase + loopMIDI für Mackie-Listener (Etappe 1)
+# Setup: Cubase + loopMIDI für den Mackie-Listener
 
-**Ziel:** Cubase sendet Mackie-Control-Messages auf einen virtuellen MIDI-Port, den unser Listener lesen kann. Optional ein zweiter Port für die spätere Senderichtung (Etappe 2/3).
+**Ziel:** Cubase sendet Mackie-Control-Messages auf einen virtuellen MIDI-Port, den unser Listener lesen kann. Ein zweiter Port übernimmt die Senderichtung (Steuerung).
 
 ---
 
 ## 1. loopMIDI installieren
 
-[https://www.tobias-erichsen.de/software/loopmidi.html](https://www.tobias-erichsen.de/software/loopmidi.html)
+Per winget (empfohlen — Claude Code kann das selbst):
+
+```powershell
+winget install -e --id TobiasErichsen.loopMIDI
+```
+
+Oder manueller Download: [tobias-erichsen.de/software/loopmidi.html](https://www.tobias-erichsen.de/software/loopmidi.html)
 
 Kostenlos, nur Windows. Nach der Installation startet loopMIDI automatisch in der Tray.
 
