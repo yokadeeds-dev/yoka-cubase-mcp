@@ -114,6 +114,10 @@ yoka-cubase-mcp/
 └── tests/selftests/   ← Offline-Selftests + Live-Smoketests
 ```
 
+## Installation
+
+**Schnellster Weg — [Claude Code](https://claude.com/claude-code) installiert es für dich:** Gib ihm den fertigen Installer-Prompt aus [`INSTALL.md`](INSTALL.md). Er erkennt dein OS, baut die venv, behebt Build-Stolpersteine, registriert den MCP-Server in deiner Config und führt dich durchs DAW-Setup. Manueller Weg im Quickstart unten.
+
 ## Quickstart (Windows)
 
 ```powershell
