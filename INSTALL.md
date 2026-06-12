@@ -47,11 +47,15 @@ fehlschlägt, statt drüberzugehen:
        "cwd": "<ABSOLUTER_PFAD_ZUM_REPO>",
        "env": { "MACKIE_DAW_DEFAULT": "cubase" }
      }
-   Verifiziere danach, dass der Server startet:  python -m runtime.mcp.server  läuft
-   ohne Importfehler (mit Strg+C beenden).
+   WICHTIG (Windows): Nutze in command/cwd FORWARD-Slashes
+   (z. B. C:/Users/.../yoka-cubase-mcp) — Backslashes werden von der
+   `claude mcp add`-Validierung mitunter abgelehnt.
+   Verifiziere danach die Verbindung: Der ueberzeugendste Beweis ist, dass Claude Code
+   den Server als "Connected" listet. Ein manueller  python -m runtime.mcp.server  wartet
+   bei stdio nur stumm auf Eingabe (kein Output = normal, KEIN Fehler) — Strg+C zum Beenden.
 
 7. DAW-Setup anleiten (GUI-Schritte, die du NICHT für mich automatisieren kannst):
-   - loopMIDI (Windows, https://www.tobias-erdmann.de/software/loopmidi.html) bzw.
+   - loopMIDI (Windows, https://www.tobias-erichsen.de/software/loopmidi.html) bzw.
      IAC (macOS: python -m runtime.setup.add_iac_ports) mit den Ports
      MACKIE_FROM_CUBASE, MACKIE_TO_CUBASE, AI_INPUT.
    - In Cubase ein Mackie-Control-Device auf diese Ports einrichten — Schritt für
