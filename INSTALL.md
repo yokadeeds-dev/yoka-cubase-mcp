@@ -1,6 +1,55 @@
 # Installation
 
-## Variante A — Claude Code installiert es für dich (empfohlen)
+## Voraussetzungen — welcher Claude?
+
+Wichtig vorab, damit niemand im falschen Weg aufläuft:
+
+- **Variante A (automatisch)** braucht **Claude Code** — und das gibt es **nicht im Free-Tier**.
+  Erforderlich ist ein Claude **Pro**- oder **Max**-Abo bzw. API-Guthaben. Der Free-Tier
+  umfasst nur die Web-/Chat-Oberfläche, nicht den Terminal-Agenten.
+- **Free-User / ohne Claude-Code-Abo:** Nutze **Variante B (manuell)**. Der Server selbst
+  läuft anschließend auch in **Claude Desktop** (inkl. Free-Tier) — trag ihn dort in die
+  `claude_desktop_config.json` ein (Einstellungen → Entwickler → Konfiguration bearbeiten),
+  gleiches `mcpServers`-Schema wie unten.
+
+Kurz: Den **agentischen Auto-Install gibt es nur mit bezahltem Claude Code**. Die Software
+und der MCP-Server selbst sind nicht an einen Tarif gebunden und laufen auch im Free-Tier
+von Claude Desktop — nur eben manuell eingerichtet.
+
+## Voraussetzungen installieren (Windows)
+
+Ein frisches Windows hat meist nicht alles. Prüfen und ggf. installieren (per winget):
+
+```powershell
+winget install --id Python.Python.3.11 -e        # Python 3.11 (zwingend)
+winget install --id Git.Git -e                   # git (zwingend)
+winget install --id TobiasErichsen.loopMIDI -e   # loopMIDI (für die MIDI-Ports, s. u.)
+```
+
+Für **Variante A** zusätzlich **Claude Code** (Pro/Max/API): Installation laut
+[claude.com/claude-code](https://claude.com/claude-code), danach `claude` starten und einloggen.
+
+macOS/Linux: Python 3.11 und git über den jeweiligen Paketmanager (Homebrew/apt/dnf).
+loopMIDI ist Windows-only — auf macOS übernehmen das die IAC-Ports (s. u.).
+
+## Orchestrator — wer steuert die 64 Tools?
+
+Installation ist das eine, **Orchestrierung** das andere: Nach dem Setup muss ein MCP-Client
+die Tools tatsächlich *fahren* — Zustand lesen, mehrere Tools verketten, Echo prüfen,
+korrigieren. Hier gibt es eine bewusste Stufung:
+
+| Ebene | Client | Erfahrung |
+|-------|--------|-----------|
+| **Boden — für alle** | Claude Desktop (inkl. Free) | Server läuft, Tools per Chat aufrufbar, Einzelaktionen („wähle Spur 3", „−3 dB auf den Lead"). Der kostenlose On-Ramp. |
+| **Decke — empfohlen** | **Claude Code** (Pro/Max/API) | Volle agentische Orchestrierung, **Nicker-Skill** (`skills/ki-studio-nicker/`), Closed-Loop-Workflows („mastere diesen Track"). Die eigentliche Erfahrung. |
+
+Warum Claude Code als Orchestrator empfohlen ist: Das Repo bringt eine **Claude-Code-Skill**
+(Nicker-Persona) mit und die 64 Tools sind auf **Closed-Loop** (`verified: true/false`)
+ausgelegt — beides will agentisch in einer Schleife gefahren werden, nicht turn-basiert.
+Technisch geht **jeder MCP-Client** (eigener API-Agent, andere Agent-IDEs); ohne die
+Skill-/Persona-Schicht fehlt aber der Komfort.
+
+## Variante A — Claude Code installiert es für dich (empfohlen, benötigt Pro/Max/API)
 
 Wenn du [Claude Code](https://claude.com/claude-code) hast (Terminal, Desktop oder IDE),
 ist der schnellste Weg, es die Installation übernehmen zu lassen: es erkennt dein OS,
@@ -70,7 +119,25 @@ fehlschlägt, statt drüberzugehen:
 
 Claude Code zeigt dir jeden Schritt und fragt vor Änderungen nach — du behältst die Kontrolle.
 
-## Variante B — manuell
+## Variante B — Bootstrap-Skript (für alle, ohne Claude-Abo)
+
+Ein deterministisches Skript macht dasselbe Headless-Setup wie Variante A, nur ohne Agent —
+für jeden, auch Free-User:
+
+```powershell
+git clone https://github.com/yokadeeds-dev/yoka-cubase-mcp.git
+cd yoka-cubase-mcp
+.\install.ps1                              # Umgebung prüfen, venv, Deps, doctor, selftest, Config-Block erzeugen
+.\install.ps1 -RegisterDesktop             # + Server automatisch in Claude Desktop eintragen (mit Backup)
+.\install.ps1 -RegisterDesktop -RegisterClaudeCode   # + zusätzlich in Claude Code (CLI) registrieren
+.\install.ps1 -RegisterClaudeCode -InstallSkill      # + Nicker-Skill nach ~/.claude/skills/ verlinken (volle Erfahrung)
+```
+
+Das Skript **stoppt bei jedem echten Fehler** und sagt dir, was fehlt (z. B. Python 3.11 oder
+C++-Build-Tools). Ohne `-RegisterDesktop` wird deine Claude-Config nicht angefasst — du bekommst
+nur den fertigen Config-Block angezeigt. `install.sh` für macOS/Linux folgt.
+
+## Variante C — vollständig manuell
 
 Siehe [README → Quickstart](README.md#quickstart-windows). Kurzform:
 
@@ -82,6 +149,64 @@ pip install -r requirements.txt
 python -m runtime.setup.doctor                          # Diagnose
 python -m tests.selftests.listener_selftest             # erwartet: [OK] bestanden
 ```
+
+## MCP-Server registrieren (manuell)
+
+Bei Variante C trägst du den Server selbst ein (Variante A/B erledigen das). **Absolute Pfade,
+Forward-Slashes** — die vermeiden JSON-Escaping und werden von Python/Windows akzeptiert.
+
+> **Zwei verschiedene Configs — nicht verwechseln:**
+> - **Claude Code** liest aus `~/.claude.json` (Windows: `C:\Users\<user>\.claude.json`) — am besten per `claude mcp add` setzen, nicht von Hand editieren.
+> - **Claude Desktop** liest aus `%APPDATA%\Claude\claude_desktop_config.json`.
+> Der `mcpServers`-JSON-Block unten (und in der README) ist das **Claude-Desktop-Format**; für Claude Code nutze den `claude mcp add-json`-Befehl weiter unten.
+
+**Claude Desktop** (Windows) — Datei `%APPDATA%\Claude\claude_desktop_config.json`
+(Einstellungen → Entwickler → Konfiguration bearbeiten; legt die Datei bei Bedarf an):
+
+```json
+{
+  "mcpServers": {
+    "yoka-cubase-mcp": {
+      "command": "C:/Pfad/zum/repo/.venv/Scripts/python.exe",
+      "args": ["-m", "runtime.mcp.server"],
+      "cwd": "C:/Pfad/zum/repo",
+      "env": { "MACKIE_DAW_DEFAULT": "cubase" }
+    }
+  }
+}
+```
+
+Danach Claude Desktop neu starten. (`install.ps1 -RegisterDesktop` macht genau das automatisch.)
+
+**Claude Code** (CLI) — den inneren Block (ohne `mcpServers`-Wrapper) als JSON übergeben:
+
+```powershell
+claude mcp add-json yoka-cubase-mcp '{"type":"stdio","command":"C:/Pfad/zum/repo/.venv/Scripts/python.exe","args":["-m","runtime.mcp.server"],"cwd":"C:/Pfad/zum/repo","env":{"MACKIE_DAW_DEFAULT":"cubase"}}' --scope user
+```
+
+> ⚠️ Wichtig: **Forward-Slashes** im Pfad — die `claude`-CLI lehnt Backslashes in der
+> command-Angabe ab.
+
+## Volle Nutzung in Claude Code — Nicker-Skill (optional)
+
+Die 64 Tools funktionieren **ohne** Zusatz — weder Desktop Commander noch weitere Konnektoren
+oder AutoHotkey sind nötig (MIDI/pywin32/OSC stecken in den Python-Deps).
+
+Für die **volle Erfahrung** (Nicker-Persona + fertige Workflows wie Mix-Inventur,
+Pre-Export-Audit, Mastering-Chain) aktivierst du die mitgelieferte Claude-Code-Skill. Sie wird
+**nicht** automatisch gefunden — Claude Code erwartet Skills unter `~/.claude/skills/`:
+
+```powershell
+# Windows (PowerShell) — Repo bleibt Source-of-Truth (Junction):
+New-Item -ItemType Junction -Path "$env:USERPROFILE\.claude\skills\ki-studio-nicker" -Target "$PWD\skills\ki-studio-nicker"
+```
+```bash
+# macOS/Linux (Symlink):
+ln -s "$PWD/skills/ki-studio-nicker" ~/.claude/skills/ki-studio-nicker
+```
+
+Danach triggert Claude Code die Skill bei Sätzen wie „Ist der Mix export-ready?" oder
+„Setup Mastering-Chain für Trip-Hop". Details: [`skills/ki-studio-nicker/README.md`](skills/ki-studio-nicker/README.md).
 
 ## Was Claude Code (oder du) **nicht** automatisieren kann
 

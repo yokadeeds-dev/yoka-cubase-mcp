@@ -38,6 +38,9 @@ runtime/state/*.log
 .env.local
 local_*
 
+# Vom install.ps1 erzeugter, maschinenspezifischer Config-Block
+claude_desktop_config.snippet.json
+
 # Build outputs
 dist/
 build/

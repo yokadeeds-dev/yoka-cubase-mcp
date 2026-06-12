@@ -39,7 +39,7 @@ New-Item -ItemType Junction -Path "$env:USERPROFILE\.claude\skills\ki-studio-nic
 ### Distribution via npx (sobald Repo public)
 
 ```bash
-npx skills add git@github.com:yokadeeds-dev/ki-studio-mackie.git
+npx skills add git@github.com:yokadeeds-dev/yoka-cubase-mcp.git
 ```
 
 ## Trigger-Verhalten

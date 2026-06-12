@@ -116,7 +116,13 @@ yoka-cubase-mcp/
 
 ## Installation
 
-**Schnellster Weg — [Claude Code](https://claude.com/claude-code) installiert es für dich:** Gib ihm den fertigen Installer-Prompt aus [`INSTALL.md`](INSTALL.md). Er erkennt dein OS, baut die venv, behebt Build-Stolpersteine, registriert den MCP-Server in deiner Config und führt dich durchs DAW-Setup. Manueller Weg im Quickstart unten.
+Drei Wege — Details und Voraussetzungen in [`INSTALL.md`](INSTALL.md):
+
+- **Für alle (tarifunabhängig):** Bootstrap-Skript `install.ps1` (Windows) bzw. `install.sh` (macOS/Linux) — prüft die Umgebung, baut die venv, installiert die Deps, läuft Doctor/Selftest und erzeugt den fertigen Config-Block. Braucht kein Claude-Abo.
+- **Komfort (Pro/Max/API):** [Claude Code](https://claude.com/claude-code) erledigt es agentisch über den Installer-Prompt in [`INSTALL.md`](INSTALL.md).
+- **Manuell:** Quickstart unten.
+
+> **Orchestrator:** Nach dem Setup steuert ein MCP-Client die 64 Tools. **Boden für alle** = Claude Desktop (inkl. Free, Einzelaktionen). **Empfohlen** = **Claude Code** für die volle agentische Orchestrierung inkl. Nicker-Skill und Closed-Loop. Mehr in [`INSTALL.md` → Orchestrator](INSTALL.md#orchestrator--wer-steuert-die-64-tools).
 
 ## Quickstart (Windows)
 
