@@ -62,3 +62,9 @@ jobs:
         run: python -m tests.selftests.mcp_server_smoketest
         timeout-minutes: 1
         continue-on-error: true  # MCP-Smoketest ist nice-to-have, blockt aber nicht
+
+      - name: Server importiert ohne Fehler (harter Import-Check)
+        run: python -c "import runtime.mcp.server as s; print(f'server OK - {len(s.TOOLS)} tools')"
+
+      - name: Installations-Doctor (Diagnose; failt nur bei fehlenden Dependencies)
+        run: python -m runtime.setup.doctor

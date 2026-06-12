@@ -1,6 +1,6 @@
 # Demo Workflows — KI-Studio Mackie
 
-Praktische Beispiele was Claude (oder ein anderer MCP-Client) mit dem 26-Tool-Stack machen kann. Sortiert nach typischer Studio-Phase.
+Praktische Beispiele was Claude (oder ein anderer MCP-Client) mit dem 64-Tool-Stack machen kann. Sortiert nach typischer Studio-Phase.
 
 ---
 

@@ -125,6 +125,9 @@ py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
+# Installation prüfen (Python, Deps, MIDI-Ports, Cubase-Setup, optionale Daten)
+python -m runtime.setup.doctor
+
 # Offline-Selftests (keine MIDI-Hardware nötig)
 python -m tests.selftests.listener_selftest
 
@@ -154,6 +157,35 @@ DAW-seitiges Setup (Mackie-Control-Device in Cubase, loopMIDI): [`docs/01_setup_
 ```
 
 Danach sind Sätze möglich wie *„wechsle in Cubase auf Track 3"*, *„setze den Lead-Synth auf −3 dB"*, *„welche Mastering-Chain für Trip-Hop?"*, *„nimm eine C-Dur-Tonleiter auf der scharfgeschalteten Spur auf"*.
+
+## Erster Lauf (minimaler Workflow)
+
+Reproduzierbar und ohne etwas zu verändern (read-only bzw. `dry_run`). Voraussetzung: Cubase offen, Projekt mit ≥ 3 Spuren, loopMIDI-Ports aktiv.
+
+```
+1. list_connected_daws                         → bestätigt: cubase initialisierbar
+2. get_daw_state(daw="cubase")                 → Snapshot: Mode, Transport, 8 Strips (Vol/Mute/Solo/VU)
+3. select_track(track_index=2)                 → wählt Spur 3 — verified: true (Echo vom DAW)
+4. set_track_volume_db(index=2, db=-6, dry_run=true)  → zeigt die geplante Änderung, ohne zu schreiben
+5. transport_play(daw="cubase") … transport_stop(daw="cubase")  → Transport an/aus, sichtbar in Cubase
+```
+
+Jeder Schritt meldet `verified: true/false` (Closed-Loop). Schritt 4 mit `dry_run=false` schreibt real (in Cubase mit Strg+Z rücknehmbar).
+
+## Sicherheit & Zonen
+
+Jedes Tool trägt eine **Zone**, die seinen Wirkungsgrad signalisiert:
+
+- 🟢 **grün — read-only:** liest nur DAW-State (`get_daw_state`, `list_tracks`, `nicker_*`-Analyse). Risikolos.
+- 🟡 **gelb — mutiert DAW-State (undobar):** Volume, Mode, Track-Select, Plugin-CC. In Cubase mit Strg+Z rücknehmbar.
+- 🔴 **rot — destruktiv / explizite Intent nötig:** `transport_record` (kann Takes überschreiben), `save_project`.
+
+**Worauf du achten solltest:**
+- **Fenster-Fokus:** Die AHK-Hotkey-Bridge sendet synthetische Tastenanschläge an das *fokussierte* Fenster. Ein Window-Guard prüft vorher, ob Cubase vorne ist — steht ein anderes Fenster im Fokus, wird die Aktion **nicht** gesendet (kein Blindschuss in fremde Apps).
+- **`dry_run` zuerst:** State-/Plugin-mutierende Tools unterstützen `dry_run=true` zur Vorschau, bevor real geschrieben wird.
+- **Aufnahme:** `transport_record` kann laufende Takes überschreiben — bewusst rote Zone.
+- **Keine Garantie bei falschem Setup:** Stimmen loopMIDI-Ports oder das Cubase-Mackie-Device nicht, melden Tools `verified: false` statt stillschweigend zu scheitern. `python -m runtime.setup.doctor` prüft das Setup vorab.
+- **Graceful degradation:** Fehlen optionale Module (`runtime/persona`, `runtime/traktor`, z. B. nach Teilcheckout), startet der Server trotzdem und bietet die Kern-Tools an, statt zu crashen.
 
 ## Status
 
