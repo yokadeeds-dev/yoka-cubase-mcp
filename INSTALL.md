@@ -135,7 +135,20 @@ cd yoka-cubase-mcp
 
 Das Skript **stoppt bei jedem echten Fehler** und sagt dir, was fehlt (z. B. Python 3.11 oder
 C++-Build-Tools). Ohne `-RegisterDesktop` wird deine Claude-Config nicht angefasst — du bekommst
-nur den fertigen Config-Block angezeigt. `install.sh` für macOS/Linux folgt.
+nur den fertigen Config-Block angezeigt.
+
+**macOS/Linux:** dieselbe Logik liegt als `install.sh` bei (gleiche Schritte, Unix-idiomatisch):
+
+```bash
+git clone https://github.com/yokadeeds-dev/yoka-cubase-mcp.git
+cd yoka-cubase-mcp
+chmod +x install.sh
+./install.sh                                          # Umgebung, venv, Deps, doctor, selftest, Config-Block
+./install.sh --register-desktop                       # + in Claude Desktop eintragen (macOS, mit Backup)
+./install.sh --register-claude-code --install-skill   # + Claude Code registrieren + Nicker-Skill verlinken
+```
+
+Auf macOS gibt es kein loopMIDI — die virtuellen Ports übernimmt der **IAC-Treiber** (Schritt 7); für eine DAW ist auf dem Mac **Ableton Live** (MCU via IAC) oft näher als Cubase. Auf Linux existiert kein Claude Desktop → nur `--register-claude-code`.
 
 ## Variante C — vollständig manuell
 
