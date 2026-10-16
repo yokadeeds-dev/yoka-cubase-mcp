@@ -1,7 +1,7 @@
 # --- Core (MCU-Layer + MCP-Server) ---
 mido>=1.3.0
 python-rtmidi>=1.5.8
-mcp>=1.0.0
+mcp>=1.0.0,<2                           # 2.x entfernte Server.list_tools (Breaking) — 1.x bleibt kompatibel
 python-osc>=1.9.0                        # OSC-Bridge (runtime/osc/)
 
 # Windows: AHK-Bridge (Window-Guard + Key-Send, runtime/ahk/_win_impl.py)
