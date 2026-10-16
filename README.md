@@ -6,6 +6,8 @@
 
 **▶ Ready-to-install skill:** [Cubase AI Control (Mackie / MCU) on Agensi](https://agensi.io/skills/cubase-ai-control-mackie-mcu) — this server paired with a skill that tells your agent *when and how* to use it (install straight into Claude Code, Cursor, Copilot and others).
 
+**📖 Using it (beyond install):** [User Guide](docs/USER_GUIDE.md) — what to say, how to read results, the safety zones, tool groups, workflows and studio gotchas.
+
 ---
 
 ## Was das ist
