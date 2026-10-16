@@ -24,9 +24,8 @@ from mcp.client.stdio import stdio_client  # noqa: E402
 
 
 async def main() -> int:
-    venv_python = ROOT / ".venv" / "Scripts" / "python.exe"
     params = StdioServerParameters(
-        command=str(venv_python),
+        command=sys.executable,  # aktueller Interpreter — portabel (CI/macOS/Linux/Windows, venv oder nicht)
         args=["-m", "runtime.mcp.server"],
         env=None,  # nutzt Defaults im Server
         cwd=str(ROOT),
