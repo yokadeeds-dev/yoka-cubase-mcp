@@ -4,6 +4,8 @@
 
 > *Die KI muss nicht hören wie ein Mensch — sie muss verstehen: präzise, semantisch, kontinuierlich.*
 
+**▶ Ready-to-install skill:** [Cubase AI Control (Mackie / MCU) on Agensi](https://agensi.io/skills/cubase-ai-control-mackie-mcu) — this server paired with a skill that tells your agent *when and how* to use it (install straight into Claude Code, Cursor, Copilot and others).
+
 ---
 
 ## Was das ist
